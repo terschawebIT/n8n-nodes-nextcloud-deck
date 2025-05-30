@@ -329,6 +329,7 @@ export const cardFields: INodeProperties[] = [
 		description: 'Optional: Weisen Sie direkt Labels zu dieser neuen Karte zu',
 		typeOptions: {
 			searchListMethod: 'getLabels',
+			loadOptionsMethod: 'getLabels',
 		},
 		displayOptions: {
 			show: {
@@ -479,6 +480,7 @@ export const cardFields: INodeProperties[] = [
 		description: 'Optional: Weisen Sie zusätzliche Labels zu dieser Karte zu',
 		typeOptions: {
 			searchListMethod: 'getLabels',
+			loadOptionsMethod: 'getLabels',
 		},
 		displayOptions: {
 			show: {
