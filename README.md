@@ -45,6 +45,21 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **Stack aktualisieren**: Aktualisiert einen vorhandenen Stack (mit Dropdown-Auswahl)
 - **Stack löschen**: Löscht einen Stack (mit Dropdown-Auswahl)
 
+### Card-Operationen (Karten)
+
+- **Alle Karten abrufen**: Listet alle Karten eines Stacks auf (mit Board- und Stack-Dropdown)
+- **Karte abrufen**: Ruft eine spezifische Karte ab (mit Board-, Stack- und Card-Dropdown)
+- **Karte erstellen**: Erstellt eine neue Karte in einem Stack
+  - Titel (erforderlich)
+  - Beschreibung (optional, mehrzeilig)
+  - Typ: Standard oder Markdown (optional)
+  - Reihenfolge im Stack (optional)
+  - Fälligkeitsdatum (optional)
+- **Karte aktualisieren**: Aktualisiert eine vorhandene Karte (mit Dropdown-Auswahl)
+- **Karte löschen**: Löscht eine Karte (mit Dropdown-Auswahl)
+- **Benutzer zuweisen**: Weist einen Benutzer zu einer Karte zu
+- **Benutzer entfernen**: Entfernt einen Benutzer von einer Karte
+
 ### UI-Verbesserungen
 
 - **Resource Locator**: Flexible Auswahl zwischen Dropdown-Listen und direkter ID-Eingabe
@@ -62,10 +77,9 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 ### Geplante Funktionen
 
-- Card-Operationen (Karten verwalten)
-- Label-Management
-- Benutzer-Zuweisungen
-- Kommentare
+- Label-Management für Karten
+- Kommentar-System
+- Anhänge verwalten
 
 ## API-Dokumentation
 

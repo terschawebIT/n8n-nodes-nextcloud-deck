@@ -13,8 +13,10 @@ import {
 // Importe der Aktionen
 import * as boardActions from './actions/board';
 import * as stackActions from './actions/stack';
+import * as cardActions from './actions/card';
 import { IBoardUpdate } from './interfaces/board';
 import { IStackUpdate } from './interfaces/stack';
+import { ICardUpdate } from './interfaces/card';
 
 // Beschreibungen importieren
 import {
@@ -175,6 +177,56 @@ export class NextcloudDeck implements INodeType {
 					return { results: [{ name: 'Fehler beim Laden der Stacks', value: '' }] };
 				}
 			},
+			async getCards(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+				try {
+					// Holen der Board-ID und Stack-ID aus resourceLocator
+					const boardParam = this.getCurrentNodeParameter('boardId');
+					const stackParam = this.getCurrentNodeParameter('stackId');
+					
+					let boardId: number;
+					let stackId: number;
+					
+					if (typeof boardParam === 'object' && boardParam !== null) {
+						const boardResourceLocator = boardParam as { mode: string; value: string };
+						boardId = parseInt(boardResourceLocator.value, 10);
+					} else {
+						boardId = parseInt(boardParam as string, 10);
+					}
+					
+					if (typeof stackParam === 'object' && stackParam !== null) {
+						const stackResourceLocator = stackParam as { mode: string; value: string };
+						stackId = parseInt(stackResourceLocator.value, 10);
+					} else {
+						stackId = parseInt(stackParam as string, 10);
+					}
+					
+					if (!boardId || isNaN(boardId) || !stackId || isNaN(stackId)) {
+						return { results: [{ name: 'Bitte wählen Sie zuerst Board und Stack', value: '' }] };
+					}
+					
+					const cards = await cardActions.getCards.call(this, boardId, stackId);
+					if (!cards || cards.length === 0) {
+						return { results: [{ name: 'Keine Karten gefunden', value: '' }] };
+					}
+					
+					let filteredCards = cards;
+					if (filter && filter.trim().length > 0) {
+						const normalized = filter.toLowerCase();
+						filteredCards = cards.filter(card => 
+							card.title.toLowerCase().includes(normalized)
+						);
+					}
+					
+					return {
+						results: filteredCards.map((card) => ({
+							name: card.title,
+							value: card.id?.toString() || '',
+						}))
+					};
+				} catch (_error) {
+					return { results: [{ name: 'Fehler beim Laden der Karten', value: '' }] };
+				}
+			},
 		},
 	};
 
@@ -327,11 +379,119 @@ export class NextcloudDeck implements INodeType {
 						});
 					}
 				} else if (resource === 'card') {
-					// Card-Operationen (Platzhalter)
+					// Card-Operationen
 					if (operation === 'getAll') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cards = await cardActions.getCards.call(this, boardId, stackId);
 						returnData.push({
-							success: false,
-							message: 'Card-Operationen sind noch nicht implementiert',
+							success: true,
+							operation: 'getAll',
+							resource: 'card',
+							data: { cards },
+						});
+					} else if (operation === 'get') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const card = await cardActions.getCard.call(this, boardId, stackId, cardId);
+						returnData.push({
+							success: true,
+							operation: 'get',
+							resource: 'card',
+							data: { card },
+						});
+					} else if (operation === 'create') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const title = this.getNodeParameter('title', i) as string;
+						const description = this.getNodeParameter('description', i, '') as string;
+						const type = this.getNodeParameter('type', i, 'plain') as string;
+						const order = this.getNodeParameter('order', i, 0) as number;
+						const duedate = this.getNodeParameter('duedate', i, '') as string;
+						
+						const cardData: { title: string; type?: string; order?: number; description?: string; duedate?: string } = { title };
+						if (description) cardData.description = description;
+						if (type && type !== 'plain') cardData.type = type;
+						if (order > 0) cardData.order = order;
+						if (duedate) cardData.duedate = duedate;
+						
+						const card = await cardActions.createCard.call(this, boardId, stackId, cardData);
+						returnData.push({
+							success: true,
+							operation: 'create',
+							resource: 'card',
+							message: 'Karte erfolgreich erstellt',
+							data: { card },
+						});
+					} else if (operation === 'update') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const title = this.getNodeParameter('title', i, '') as string;
+						const description = this.getNodeParameter('description', i, '') as string;
+						const type = this.getNodeParameter('type', i, '') as string;
+						const order = this.getNodeParameter('order', i, 0) as number;
+						const duedate = this.getNodeParameter('duedate', i, '') as string;
+						
+						// Wenn order = 0, holen wir die aktuelle Reihenfolge
+						let finalOrder = order;
+						if (order === 0) {
+							const currentCard = await cardActions.getCard.call(this, boardId, stackId, cardId);
+							finalOrder = currentCard.order || 0;
+						}
+						
+						const cardData: ICardUpdate = { id: cardId, order: finalOrder };
+						if (title) cardData.title = title;
+						if (description) cardData.description = description;
+						if (type) cardData.type = type;
+						if (duedate) cardData.duedate = duedate;
+						
+						const card = await cardActions.updateCard.call(this, boardId, stackId, cardData);
+						returnData.push({
+							success: true,
+							operation: 'update',
+							resource: 'card',
+							message: 'Karte erfolgreich aktualisiert',
+							data: { card },
+						});
+					} else if (operation === 'delete') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const response = await cardActions.deleteCard.call(this, boardId, stackId, cardId);
+						returnData.push({
+							success: true,
+							operation: 'delete',
+							resource: 'card',
+							message: 'Karte erfolgreich gelöscht',
+							data: response,
+						});
+					} else if (operation === 'assignUser') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const userId = this.getNodeParameter('userId', i) as string;
+						const response = await cardActions.assignUserToCard.call(this, boardId, stackId, cardId, userId);
+						returnData.push({
+							success: true,
+							operation: 'assignUser',
+							resource: 'card',
+							message: 'Benutzer erfolgreich zugewiesen',
+							data: response,
+						});
+					} else if (operation === 'unassignUser') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const userId = this.getNodeParameter('userId', i) as string;
+						const response = await cardActions.unassignUserFromCard.call(this, boardId, stackId, cardId, userId);
+						returnData.push({
+							success: true,
+							operation: 'unassignUser',
+							resource: 'card',
+							message: 'Benutzer erfolgreich entfernt',
+							data: response,
 						});
 					}
 				}

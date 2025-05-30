@@ -1,12 +1,13 @@
 import {
 	IExecuteFunctions,
+	ILoadOptionsFunctions,
 	IDataObject,
 } from 'n8n-workflow';
 import { nextcloudDeckApiRequest, nextcloudDeckOcsApiRequest } from '../helpers/api';
 import { ICard } from '../interfaces/stack';
 import { ICardCreate, ICardUpdate, IComment, ICommentCreate } from '../interfaces/card';
 
-export async function getCards(this: IExecuteFunctions, boardId: number, stackId: number): Promise<ICard[]> {
+export async function getCards(this: IExecuteFunctions | ILoadOptionsFunctions, boardId: number, stackId: number): Promise<ICard[]> {
 	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks/${stackId}/cards`);
 	return response as unknown as ICard[];
 }
