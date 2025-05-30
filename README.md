@@ -90,6 +90,34 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 > **Hinweis**: Kommentare werden über die Nextcloud OCS Comments API verwaltet und erfordern entsprechende Berechtigungen.
 
+### Attachment-Operationen (Anhänge) 🆕
+
+- **✨ Alle Anhänge Abrufen**: Listet alle Anhänge einer Karte auf
+  - Vollständige Board → Stack → Card Auswahl mit ResourceLocator
+  - Zeigt alle Attachment-Details inkl. Dateigröße und MIME-Type
+- **✨ Anhang Abrufen**: Ruft einen spezifischen Anhang ab
+  - Genaue Attachment-Details und Metadaten
+- **✨ Anhang Erstellen**: Fügt einen neuen Anhang zu einer Karte hinzu
+  - **Typ-Auswahl**: "Deck-Datei" oder "Nextcloud-Datei"
+  - **Flexible Datenquelle**: Dateipfad oder Dateiinhalt
+  - **Automatische Integration**: Direkte Synchronisation mit Nextcloud Files
+- **✨ Anhang Aktualisieren**: Aktualisiert einen vorhandenen Anhang
+  - **Optionale Datenänderung**: Neue Datei oder Pfad (optional)
+- **✨ Anhang Löschen**: Entfernt einen Anhang komplett
+  - **Sichere Löschung**: Bestätigung via Attachment-ID
+
+### Attachment-Typ Unterstützung
+
+- **`deck_file`**: Dateien, die direkt innerhalb der Deck-App gespeichert werden
+  - Legacy-Support für ältere Deck-Versionen (< 1.3.0)
+  - Interne Deck-Dateiverwaltung
+- **`file`**: Dateien aus der regulären Nextcloud-Dateiverwaltung (empfohlen)
+  - Standard ab Deck 1.3.0+
+  - Integration mit Nextcloud Files
+  - Bessere Synchronisation und Freigabe
+
+> **💡 API-Hinweis**: Die Attachment-Funktionalität basiert auf der [offiziellen Deck Attachments API](https://deck.readthedocs.io/en/latest/API/#attachments) und verwendet REST-Endpunkte für optimale Kompatibilität.
+
 ### UI-Verbesserungen
 
 - **Resource Locator**: Flexible Auswahl zwischen Dropdown-Listen und direkter ID-Eingabe
@@ -115,7 +143,7 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 ### Geplante Funktionen
 
-- Anhänge verwalten
+- ~~Anhänge verwalten~~ ✅ **Implementiert!**
 - ~~Kommentar-System~~ ✅ **Implementiert!**
 
 ## API-Dokumentation

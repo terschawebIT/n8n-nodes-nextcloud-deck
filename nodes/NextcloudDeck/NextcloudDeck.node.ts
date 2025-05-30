@@ -11,34 +11,91 @@ import {
 } from 'n8n-workflow';
 
 // Modulare Handler importieren
-import { BoardHandler, StackHandler, CardHandler, LabelHandler, CommentHandler } from './handlers/resource.handlers';
+import { BoardHandler, StackHandler, CardHandler, LabelHandler, CommentHandler, AttachmentHandler } from './handlers/resource.handlers';
 import { NodeLoadOptions, NodeListSearch } from './helpers/node.methods';
 
 // Beschreibungen importieren
 import { nodeProperties } from './descriptions';
+import { boardOperations, boardFields } from './descriptions/board';
+import { stackOperations, stackFields } from './descriptions/stack';
+import { cardOperations, cardFields } from './descriptions/card';
+import { commentOperations, commentFields } from './descriptions/comment';
+import { attachmentOperations, attachmentFields } from './descriptions/attachment';
 
 export class NextcloudDeck implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Nextcloud Deck',
 		name: 'nextcloudDeck',
-		icon: 'file:nextcloud-deck.svg',
-		group: ['output'],
+		icon: 'file:nextcloud.svg',
+		group: ['transform'],
 		version: 1,
-		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Verwalten Sie Ihre Nextcloud Deck Boards, Stacks und Karten',
+		subtitle: '={{ $parameter["operation"] + ": " + $parameter["resource"] }}',
+		description: 'Verwalten Sie Ihre Nextcloud Deck-Boards, Stacks, Karten und mehr',
 		defaults: {
 			name: 'Nextcloud Deck',
 		},
-		inputs: [{ type: NodeConnectionType.Main }],
-		outputs: [{ type: NodeConnectionType.Main }],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'nextcloudDeckApi',
 				required: true,
-				displayName: 'Nextcloud Deck API',
 			},
 		],
-		properties: nodeProperties,
+		requestDefaults: {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+		},
+		properties: [
+			{
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Board',
+						value: 'board',
+						description: 'Operationen mit Deck-Boards',
+					},
+					{
+						name: 'Stack',
+						value: 'stack',
+						description: 'Operationen mit Deck-Stacks',
+					},
+					{
+						name: 'Karte',
+						value: 'card',
+						description: 'Operationen mit Deck-Karten',
+					},
+					{
+						name: 'Kommentar',
+						value: 'comment',
+						description: 'Operationen mit Karten-Kommentaren',
+					},
+					{
+						name: 'Anhang',
+						value: 'attachment',
+						description: 'Operationen mit Karten-Anhängen',
+					},
+				],
+				default: 'board',
+				description: 'Die Ressource für diese Operation',
+			},
+			// Operationen und Felder
+			...boardOperations,
+			...boardFields,
+			...stackOperations,
+			...stackFields,
+			...cardOperations,
+			...cardFields,
+			...commentOperations,
+			...commentFields,
+			...attachmentOperations,
+			...attachmentFields,
+		],
 	};
 
 	methods = {
@@ -74,15 +131,14 @@ export class NextcloudDeck implements INodeType {
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
-		const returnData: IDataObject[] = [];
-		const resource = this.getNodeParameter('resource', 0) as string;
-		const operation = this.getNodeParameter('operation', 0) as string;
+		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-				let result: IDataObject;
+				const resource = this.getNodeParameter('resource', i) as string;
+				const operation = this.getNodeParameter('operation', i) as string;
 
-				// Delegiere an entsprechende Handler
+				let result;
 				switch (resource) {
 					case 'board':
 						result = await BoardHandler.execute.call(this, operation, i);
@@ -93,25 +149,22 @@ export class NextcloudDeck implements INodeType {
 					case 'card':
 						result = await CardHandler.execute.call(this, operation, i);
 						break;
-					case 'label':
-						result = await LabelHandler.execute.call(this, operation, i);
-						break;
 					case 'comment':
 						result = await CommentHandler.execute.call(this, operation, i);
+						break;
+					case 'attachment':
+						result = await AttachmentHandler.execute.call(this, operation, i);
 						break;
 					default:
 						throw new Error(`Unbekannte Ressource: ${resource}`);
 				}
 
-				returnData.push(result);
-			} catch (error: unknown) {
+				returnData.push({ json: result });
+			} catch (error) {
 				const nodeError = error as Error;
 				if (this.continueOnFail()) {
 					returnData.push({
-						success: false,
-						error: nodeError.message || 'Unbekannter Fehler',
-						operation,
-						resource,
+						json: { error: nodeError.message },
 					});
 				} else {
 					throw error;
@@ -119,6 +172,6 @@ export class NextcloudDeck implements INodeType {
 			}
 		}
 
-		return [this.helpers.returnJsonArray(returnData)];
+		return this.prepareOutputData(returnData);
 	}
 } 

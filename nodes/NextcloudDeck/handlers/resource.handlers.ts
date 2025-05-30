@@ -3,10 +3,12 @@ import * as boardActions from '../actions/board';
 import * as stackActions from '../actions/stack';
 import * as cardActions from '../actions/card';
 import * as commentActions from '../actions/comment';
+import * as attachmentActions from '../actions/attachment';
 import { IBoardUpdate } from '../interfaces/board';
 import { IStackUpdate } from '../interfaces/stack';
 import { ICardUpdate, ILabelCreate, ILabelUpdate } from '../interfaces/card';
 import { ICommentCreate, ICommentUpdate } from '../interfaces/comment';
+import { IAttachmentCreate, IAttachmentUpdate } from '../interfaces/attachment';
 
 // Hilfsfunktion zum Extrahieren von resourceLocator-Werten
 export const getResourceId = (resourceParam: unknown): number => {
@@ -444,8 +446,9 @@ export class CommentHandler {
 				data: { comments, cardId },
 			};
 		} else if (operation === 'get') {
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
 			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
-			const comment = await commentActions.getComment.call(this, commentId);
+			const comment = await commentActions.getComment.call(this, cardId, commentId);
 			return {
 				success: true,
 				operation: 'get',
@@ -466,11 +469,12 @@ export class CommentHandler {
 				data: { comment },
 			};
 		} else if (operation === 'update') {
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
 			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
 			const message = this.getNodeParameter('message', i) as string;
 			
 			const commentData: ICommentUpdate = { message };
-			const comment = await commentActions.updateComment.call(this, commentId, commentData);
+			const comment = await commentActions.updateComment.call(this, cardId, commentId, commentData);
 			return {
 				success: true,
 				operation: 'update',
@@ -479,13 +483,93 @@ export class CommentHandler {
 				data: { comment },
 			};
 		} else if (operation === 'delete') {
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
 			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
-			const response = await commentActions.deleteComment.call(this, commentId);
+			const response = await commentActions.deleteComment.call(this, cardId, commentId);
 			return {
 				success: true,
 				operation: 'delete',
 				resource: 'comment',
 				message: 'Kommentar erfolgreich gelöscht',
+				data: response,
+			};
+		}
+		
+		throw new Error(`Unbekannte Operation: ${operation}`);
+	}
+}
+
+export class AttachmentHandler {
+	static async execute(this: IExecuteFunctions, operation: string, i: number): Promise<IDataObject> {
+		if (operation === 'getAll') {
+			const boardId = getResourceId(this.getNodeParameter('boardId', i));
+			const stackId = getResourceId(this.getNodeParameter('stackId', i));
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const attachments = await attachmentActions.getAttachments.call(this, boardId, stackId, cardId);
+			return {
+				success: true,
+				operation: 'getAll',
+				resource: 'attachment',
+				message: `${attachments.length} Anhänge in der Karte gefunden`,
+				data: { attachments, boardId, stackId, cardId },
+			};
+		} else if (operation === 'get') {
+			const boardId = getResourceId(this.getNodeParameter('boardId', i));
+			const stackId = getResourceId(this.getNodeParameter('stackId', i));
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const attachmentId = parseInt(this.getNodeParameter('attachmentId', i) as string, 10);
+			const attachment = await attachmentActions.getAttachment.call(this, boardId, stackId, cardId, attachmentId);
+			return {
+				success: true,
+				operation: 'get',
+				resource: 'attachment',
+				data: { attachment },
+			};
+		} else if (operation === 'create') {
+			const boardId = getResourceId(this.getNodeParameter('boardId', i));
+			const stackId = getResourceId(this.getNodeParameter('stackId', i));
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const type = this.getNodeParameter('type', i) as 'deck_file' | 'file';
+			const data = this.getNodeParameter('data', i) as string;
+			
+			const attachmentData: IAttachmentCreate = { type, data };
+			const attachment = await attachmentActions.createAttachment.call(this, boardId, stackId, cardId, attachmentData);
+			return {
+				success: true,
+				operation: 'create',
+				resource: 'attachment',
+				message: 'Anhang erfolgreich erstellt',
+				data: { attachment },
+			};
+		} else if (operation === 'update') {
+			const boardId = getResourceId(this.getNodeParameter('boardId', i));
+			const stackId = getResourceId(this.getNodeParameter('stackId', i));
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const attachmentId = parseInt(this.getNodeParameter('attachmentId', i) as string, 10);
+			const data = this.getNodeParameter('data', i, '') as string;
+			
+			const attachmentData: IAttachmentUpdate = { id: attachmentId };
+			if (data) attachmentData.data = data;
+			
+			const attachment = await attachmentActions.updateAttachment.call(this, boardId, stackId, cardId, attachmentData);
+			return {
+				success: true,
+				operation: 'update',
+				resource: 'attachment',
+				message: 'Anhang erfolgreich aktualisiert',
+				data: { attachment },
+			};
+		} else if (operation === 'delete') {
+			const boardId = getResourceId(this.getNodeParameter('boardId', i));
+			const stackId = getResourceId(this.getNodeParameter('stackId', i));
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const attachmentId = parseInt(this.getNodeParameter('attachmentId', i) as string, 10);
+			const response = await attachmentActions.deleteAttachment.call(this, boardId, stackId, cardId, attachmentId);
+			return {
+				success: true,
+				operation: 'delete',
+				resource: 'attachment',
+				message: 'Anhang erfolgreich gelöscht',
 				data: response,
 			};
 		}
