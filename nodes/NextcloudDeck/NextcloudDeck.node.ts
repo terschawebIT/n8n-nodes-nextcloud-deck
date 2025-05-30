@@ -294,11 +294,11 @@ export class NextcloudDeck implements INodeType {
 						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const title = this.getNodeParameter('title', i, '') as string;
-						const order = this.getNodeParameter('order', i, undefined) as number | undefined;
+						const order = this.getNodeParameter('order', i, 0) as number;
 						
 						const stackData: IStackUpdate = { id: stackId, boardId };
 						if (title) stackData.title = title;
-						if (order !== undefined && order > 0) stackData.order = order;
+						if (order > 0) stackData.order = order;
 						
 						const stack = await stackActions.updateStack.call(this, boardId, stackData);
 						returnData.push({

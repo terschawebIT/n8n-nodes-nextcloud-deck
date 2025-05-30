@@ -189,7 +189,7 @@ export const stackFields: INodeProperties[] = [
 				operation: ['update'],
 			},
 		},
-		default: undefined,
-		description: 'Die neue Position des Stacks im Board (leer lassen wenn nicht ändern)',
+		default: 0,
+		description: 'Die neue Position des Stacks im Board (0 = nicht ändern)',
 	},
 ]; 
