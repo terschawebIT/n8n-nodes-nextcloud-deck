@@ -32,18 +32,24 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 ### Board-Operationen
 
 - **Alle Boards abrufen**: Listet alle verfügbaren Boards auf
-- **Board abrufen**: Ruft ein spezifisches Board ab
+- **Board abrufen**: Ruft ein spezifisches Board ab (mit Dropdown-Auswahl)
 - **Board erstellen**: Erstellt ein neues Board
-- **Board aktualisieren**: Aktualisiert ein vorhandenes Board
-- **Board löschen**: Löscht ein Board
+- **Board aktualisieren**: Aktualisiert ein vorhandenes Board (mit Dropdown-Auswahl)
+- **Board löschen**: Löscht ein Board (mit Dropdown-Auswahl)
 
 ### Stack-Operationen (Spalten)
 
-- **Alle Stacks abrufen**: Listet alle Stacks eines Boards auf
-- **Stack abrufen**: Ruft einen spezifischen Stack ab
-- **Stack erstellen**: Erstellt einen neuen Stack in einem Board
-- **Stack aktualisieren**: Aktualisiert einen vorhandenen Stack
-- **Stack löschen**: Löscht einen Stack
+- **Alle Stacks abrufen**: Listet alle Stacks eines Boards auf (mit Board-Dropdown)
+- **Stack abrufen**: Ruft einen spezifischen Stack ab (mit Board- und Stack-Dropdown)
+- **Stack erstellen**: Erstellt einen neuen Stack in einem Board (mit Board-Dropdown)
+- **Stack aktualisieren**: Aktualisiert einen vorhandenen Stack (mit Dropdown-Auswahl)
+- **Stack löschen**: Löscht einen Stack (mit Dropdown-Auswahl)
+
+### UI-Verbesserungen
+
+- **Dropdown-Listen**: Alle Board- und Stack-Auswahlen verwenden benutzerfreundliche Dropdown-Listen
+- **Dynamische Listen**: Stack-Listen werden automatisch basierend auf der Board-Auswahl aktualisiert
+- **Intelligente Validierung**: Optionale Felder werden nur gesendet wenn sie Werte enthalten
 
 ### Geplante Funktionen
 

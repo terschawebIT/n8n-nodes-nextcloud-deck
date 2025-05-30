@@ -48,26 +48,33 @@ export const stackOperations: INodeProperties[] = [
 ];
 
 export const stackFields: INodeProperties[] = [
-	// Board-ID für alle Stack-Operationen
+	// Board-ID als Dropdown für alle Stack-Operationen
 	{
-		displayName: 'Board-ID',
+		displayName: 'Board',
 		name: 'boardId',
-		type: 'number',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getBoards',
+		},
 		required: true,
 		displayOptions: {
 			show: {
 				resource: ['stack'],
 			},
 		},
-		default: 0,
-		description: 'Die ID des Boards, zu dem der Stack gehört',
+		default: '',
+		description: 'Wählen Sie das Board aus',
 	},
 
-	// Stack-ID für get, update, delete
+	// Stack-ID als Dropdown für get, update, delete
 	{
-		displayName: 'Stack-ID',
+		displayName: 'Stack',
 		name: 'stackId',
-		type: 'number',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getStacks',
+			loadOptionsDependsOn: ['boardId'],
+		},
 		required: true,
 		displayOptions: {
 			show: {
@@ -75,8 +82,8 @@ export const stackFields: INodeProperties[] = [
 				operation: ['get', 'update', 'delete'],
 			},
 		},
-		default: 0,
-		description: 'Die ID des Stacks',
+		default: '',
+		description: 'Wählen Sie den Stack aus',
 	},
 
 	// Titel für create
@@ -107,12 +114,12 @@ export const stackFields: INodeProperties[] = [
 			},
 		},
 		default: 0,
-		description: 'Die Position des Stacks im Board (optional)',
+		description: 'Die Position des Stacks im Board (optional, 0 = am Ende)',
 	},
 
 	// Zusätzliche Felder für update
 	{
-		displayName: 'Titel',
+		displayName: 'Neuer Titel',
 		name: 'title',
 		type: 'string',
 		displayOptions: {
@@ -122,11 +129,11 @@ export const stackFields: INodeProperties[] = [
 			},
 		},
 		default: '',
-		description: 'Der neue Titel des Stacks (optional)',
+		description: 'Der neue Titel des Stacks (leer lassen wenn nicht ändern)',
 	},
 
 	{
-		displayName: 'Reihenfolge',
+		displayName: 'Neue Reihenfolge',
 		name: 'order',
 		type: 'number',
 		displayOptions: {
@@ -135,7 +142,7 @@ export const stackFields: INodeProperties[] = [
 				operation: ['update'],
 			},
 		},
-		default: 0,
-		description: 'Die neue Position des Stacks im Board (optional)',
+		default: undefined,
+		description: 'Die neue Position des Stacks im Board (leer lassen wenn nicht ändern)',
 	},
 ]; 

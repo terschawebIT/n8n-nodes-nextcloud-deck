@@ -48,11 +48,14 @@ export const boardOperations: INodeProperties[] = [
 ];
 
 export const boardFields: INodeProperties[] = [
-	// Board-ID für get, update, delete
+	// Board-ID als Dropdown für get, update, delete
 	{
-		displayName: 'Board-ID',
+		displayName: 'Board',
 		name: 'boardId',
-		type: 'number',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getBoards',
+		},
 		required: true,
 		displayOptions: {
 			show: {
@@ -60,8 +63,8 @@ export const boardFields: INodeProperties[] = [
 				operation: ['get', 'update', 'delete'],
 			},
 		},
-		default: 0,
-		description: 'Die ID des Boards',
+		default: '',
+		description: 'Wählen Sie das Board aus',
 	},
 
 	// Titel für create
