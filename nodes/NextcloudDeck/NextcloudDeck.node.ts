@@ -29,7 +29,7 @@ import {
 	cardFields,
 } from './descriptions';
 
-import { nextcloudShareeApiRequest } from './helpers/api';
+import { nextcloudShareeApiRequest, nextcloudOcsUsersApiRequest } from './helpers/api';
 
 export class NextcloudDeck implements INodeType {
 	description: INodeTypeDescription = {
@@ -231,23 +231,65 @@ export class NextcloudDeck implements INodeType {
 			},
 			async getUsers(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
 				try {
-					// Verwende den Sharee-Endpunkt, um Benutzer zu suchen
-					const searchTerm = filter || '';
-					const endpoint = `/sharees?search=${encodeURIComponent(searchTerm)}&itemType=0&perPage=50`;
+					const credentials = await this.getCredentials('nextcloudDeckApi');
+					const currentUser = credentials.username as string;
+					const results: Array<{ name: string; value: string }> = [];
 					
-					const response = await nextcloudShareeApiRequest.call(this, 'GET', endpoint);
-					const shareeData = response as { users?: Array<{ value: { shareWith: string; shareWithDisplayName: string } }> };
+					// Füge den aktuellen Benutzer immer als ersten Eintrag hinzu
+					const currentUserDisplayName = `${currentUser} (Sie selbst)`;
+					results.push({ name: currentUserDisplayName, value: currentUser });
 					
-					if (!shareeData.users || shareeData.users.length === 0) {
-						return { results: [{ name: 'Keine Benutzer gefunden', value: '' }] };
+					try {
+						// Verwende den Sharee-Endpunkt, um weitere Benutzer zu suchen
+						const searchTerm = filter || '';
+						const endpoint = `/sharees?search=${encodeURIComponent(searchTerm)}&itemType=0&perPage=50`;
+						
+						const response = await nextcloudShareeApiRequest.call(this, 'GET', endpoint);
+						const shareeData = response as { users?: Array<{ value: { shareWith: string; shareWithDisplayName: string } }> };
+						
+						if (shareeData.users && shareeData.users.length > 0) {
+							// Füge Sharee-Benutzer hinzu (aber nicht den aktuellen Benutzer doppelt)
+							for (const user of shareeData.users) {
+								if (user.value.shareWith !== currentUser) {
+									results.push({
+										name: user.value.shareWithDisplayName || user.value.shareWith,
+										value: user.value.shareWith,
+									});
+								}
+							}
+						}
+					} catch (shareeError) {
+						// Fallback: Verwende OCS Users API, wenn Sharee API fehlschlägt
+						try {
+							const usersResponse = await nextcloudOcsUsersApiRequest.call(this, 'GET', '/users');
+							const usersData = usersResponse as { users?: string[] };
+							
+							if (usersData.users && usersData.users.length > 0) {
+								// Füge alle Benutzer hinzu (aber nicht den aktuellen Benutzer doppelt)
+								for (const userId of usersData.users) {
+									if (userId !== currentUser) {
+										// Filter anwenden, wenn angegeben
+										if (!filter || userId.toLowerCase().includes(filter.toLowerCase())) {
+											results.push({
+												name: userId,
+												value: userId,
+											});
+										}
+									}
+								}
+							}
+						} catch (usersError) {
+							// Wenn beide APIs fehlschlagen, zeige nur den aktuellen Benutzer
+							console.warn('Benutzersuche fehlgeschlagen:', usersError);
+						}
 					}
 					
-					return {
-						results: shareeData.users.map((user) => ({
-							name: user.value.shareWithDisplayName || user.value.shareWith,
-							value: user.value.shareWith,
-						}))
-					};
+					// Entferne Duplikate und begrenze auf 50 Ergebnisse
+					const uniqueResults = results.filter((result, index, self) => 
+						index === self.findIndex(r => r.value === result.value)
+					).slice(0, 50);
+					
+					return { results: uniqueResults };
 				} catch (_error) {
 					return { results: [{ name: 'Fehler beim Laden der Benutzer', value: '' }] };
 				}
