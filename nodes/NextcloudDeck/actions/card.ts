@@ -26,7 +26,17 @@ export async function createCard(this: IExecuteFunctions, boardId: number, stack
 
 export async function updateCard(this: IExecuteFunctions, boardId: number, stackId: number, cardData: ICardUpdate): Promise<ICard> {
 	const { id, ...updateData } = cardData;
-	const response = await nextcloudDeckApiRequest.call(this, 'PUT', `/boards/${boardId}/stacks/${stackId}/cards/${id}`, updateData);
+	
+	// Zuerst die aktuelle Karte abrufen, um den owner zu erhalten
+	const currentCard = await getCard.call(this, boardId, stackId, id);
+	
+	// Owner zur Update-Data hinzufügen (erforderlich von der API)
+	const updateDataWithOwner = {
+		...updateData,
+		owner: (currentCard as unknown as { owner?: string }).owner || '',
+	};
+	
+	const response = await nextcloudDeckApiRequest.call(this, 'PUT', `/boards/${boardId}/stacks/${stackId}/cards/${id}`, updateDataWithOwner);
 	return response as unknown as ICard;
 }
 

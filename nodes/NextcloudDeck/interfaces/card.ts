@@ -10,6 +10,7 @@ export interface ICardCreate extends IDataObject {
 
 export interface ICardUpdate extends Partial<ICardCreate> {
 	id: number;
+	owner?: string;
 }
 
 export interface ICardAssignment {
