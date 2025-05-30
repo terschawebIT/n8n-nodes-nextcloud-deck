@@ -1,0 +1,61 @@
+{
+  "name": "n8n-nodes-nextcloud-deck",
+  "version": "0.1.0",
+  "description": "n8n Node für die Integration mit Nextcloud Deck",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n-node-nextcloud",
+    "nextcloud",
+    "deck",
+    "kanban",
+    "project-management"
+  ],
+  "license": "MIT",
+  "homepage": "https://n8n.io",
+  "author": {
+    "name": "Niko Terschawetz",
+    "email": "nt@terschaweb.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terschawebIT/n8n-nodes-nextcloud-deck.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\"",
+    "lintfix": "eslint \"nodes/**/*.ts\" \"credentials/**/*.ts\" --fix",
+    "prepublishOnly": "npm run build && npm run lint"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/NextcloudDeckApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/NextcloudDeck/NextcloudDeck.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
+    "gulp": "^5.0.0",
+    "n8n-workflow": "^1.2.0",
+    "prettier": "^3.0.0",
+    "typescript": "~5.3.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": ">=1.0.0"
+  }
+} 
