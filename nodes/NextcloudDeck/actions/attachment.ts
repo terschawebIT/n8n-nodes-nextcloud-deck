@@ -5,8 +5,27 @@ import { IAttachment, IAttachmentCreate, IAttachmentUpdate } from '../interfaces
 export async function getAttachments(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number): Promise<IAttachment[]> {
 	// GET /boards/{boardId}/stacks/{stackId}/cards/{cardId}/attachments
 	const endpoint = `/boards/${boardId}/stacks/${stackId}/cards/${cardId}/attachments`;
-	const response = await nextcloudDeckApiRequest.call(this, 'GET', endpoint);
-	return response as unknown as IAttachment[];
+	console.log(`DEBUG: Requesting attachments from: ${endpoint}`);
+	
+	try {
+		const response = await nextcloudDeckApiRequest.call(this, 'GET', endpoint);
+		console.log(`DEBUG: Attachments API response:`, JSON.stringify(response, null, 2));
+		
+		// Handle different response formats
+		if (Array.isArray(response)) {
+			return response as unknown as IAttachment[];
+		} else if (response && typeof response === 'object' && 'data' in response) {
+			const data = (response as any).data;
+			if (Array.isArray(data)) {
+				return data as unknown as IAttachment[];
+			}
+		}
+		
+		return response as unknown as IAttachment[];
+	} catch (error) {
+		console.error(`DEBUG: Error fetching attachments:`, error);
+		throw error;
+	}
 }
 
 export async function getAttachment(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number, attachmentId: number): Promise<IAttachment> {
