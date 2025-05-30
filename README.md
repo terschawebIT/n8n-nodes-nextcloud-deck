@@ -37,9 +37,16 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **Board aktualisieren**: Aktualisiert ein vorhandenes Board
 - **Board löschen**: Löscht ein Board
 
+### Stack-Operationen (Spalten)
+
+- **Alle Stacks abrufen**: Listet alle Stacks eines Boards auf
+- **Stack abrufen**: Ruft einen spezifischen Stack ab
+- **Stack erstellen**: Erstellt einen neuen Stack in einem Board
+- **Stack aktualisieren**: Aktualisiert einen vorhandenen Stack
+- **Stack löschen**: Löscht einen Stack
+
 ### Geplante Funktionen
 
-- Stack-Operationen (Spalten verwalten)
 - Card-Operationen (Karten verwalten)
 - Label-Management
 - Benutzer-Zuweisungen
@@ -51,15 +58,15 @@ Diese Node basiert auf der [Nextcloud Deck REST API](https://deck.readthedocs.io
 
 ## Beispiel-Workflow
 
-1. **Alle Boards abrufen**
-   - Ressource: Board
-   - Operation: Alle Boards abrufen
+1. **Board und Stacks erstellen**
+   - Ressource: Board → Operation: Board erstellen
+   - Titel: "Mein Projekt", Farbe: "0082C9"
+   - Ressource: Stack → Operation: Stack erstellen
+   - Board-ID: {Board-ID}, Titel: "To Do"
 
-2. **Neues Board erstellen**
-   - Ressource: Board
-   - Operation: Board erstellen
-   - Titel: "Mein neues Projekt"
-   - Farbe: "0082C9" (Blau)
+2. **Workflow organisieren**
+   - Erstellen Sie Stacks wie "To Do", "In Progress", "Done"
+   - Verwenden Sie die Reihenfolge-Parameter für die richtige Anordnung
 
 ## Entwicklung
 

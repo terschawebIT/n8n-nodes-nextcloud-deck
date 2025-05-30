@@ -1,11 +1,12 @@
 import {
 	IExecuteFunctions,
 	IDataObject,
+	ILoadOptionsFunctions,
 } from 'n8n-workflow';
 import { nextcloudDeckApiRequest } from '../helpers/api';
 import { IStack, IStackCreate, IStackUpdate } from '../interfaces/stack';
 
-export async function getStacks(this: IExecuteFunctions, boardId: number): Promise<IStack[]> {
+export async function getStacks(this: IExecuteFunctions | ILoadOptionsFunctions, boardId: number): Promise<IStack[]> {
 	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks`);
 	return response as unknown as IStack[];
 }

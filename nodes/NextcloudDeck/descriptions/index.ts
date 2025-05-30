@@ -1,5 +1,6 @@
 import { INodeProperties } from 'n8n-workflow';
 import { boardOperations, boardFields } from './board';
+import { stackOperations, stackFields } from './stack';
 
 export const resources: INodeProperties[] = [
 	{
@@ -30,33 +31,9 @@ export const resources: INodeProperties[] = [
 
 // Export aller Operationen und Felder
 export { boardOperations, boardFields };
+export { stackOperations, stackFields };
 
-// Temporäre Platzhalter für Stack und Card Operationen
-export const stackOperations: INodeProperties[] = [
-	{
-		displayName: 'Operation',
-		name: 'operation',
-		type: 'options',
-		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: ['stack'],
-			},
-		},
-		options: [
-			{
-				name: 'Alle Stacks Abrufen',
-				value: 'getAll',
-				description: 'Alle Stacks eines Boards abrufen',
-				action: 'Alle Stacks abrufen',
-			},
-		],
-		default: 'getAll',
-	},
-];
-
-export const stackFields: INodeProperties[] = [];
-
+// Temporäre Platzhalter für Card Operationen
 export const cardOperations: INodeProperties[] = [
 	{
 		displayName: 'Operation',

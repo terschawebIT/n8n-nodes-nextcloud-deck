@@ -11,7 +11,9 @@ import {
 
 // Importe der Aktionen
 import * as boardActions from './actions/board';
+import * as stackActions from './actions/stack';
 import { IBoardUpdate } from './interfaces/board';
+import { IStackUpdate } from './interfaces/stack';
 
 // Beschreibungen importieren
 import {
@@ -79,6 +81,25 @@ export class NextcloudDeck implements INodeType {
 					}));
 				} catch (_error) {
 					return [{ name: 'Fehler beim Laden der Boards', value: '' }];
+				}
+			},
+			async getStacks(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				try {
+					const boardId = this.getCurrentNodeParameter('boardId') as number;
+					if (!boardId) {
+						return [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }];
+					}
+					
+					const stacks = await stackActions.getStacks.call(this, boardId);
+					if (!stacks || stacks.length === 0) {
+						return [{ name: 'Keine Stacks gefunden', value: '' }];
+					}
+					return stacks.map((stack) => ({
+						name: stack.title,
+						value: stack.id?.toString() || '',
+					}));
+				} catch (_error) {
+					return [{ name: 'Fehler beim Laden der Stacks', value: '' }];
 				}
 			},
 		},
@@ -153,11 +174,68 @@ export class NextcloudDeck implements INodeType {
 						});
 					}
 				} else if (resource === 'stack') {
-					// Stack-Operationen (Platzhalter)
+					// Stack-Operationen
 					if (operation === 'getAll') {
+						const boardId = this.getNodeParameter('boardId', i) as number;
+						const stacks = await stackActions.getStacks.call(this, boardId);
 						returnData.push({
-							success: false,
-							message: 'Stack-Operationen sind noch nicht implementiert',
+							success: true,
+							operation: 'getAll',
+							resource: 'stack',
+							data: { stacks },
+						});
+					} else if (operation === 'get') {
+						const boardId = this.getNodeParameter('boardId', i) as number;
+						const stackId = this.getNodeParameter('stackId', i) as number;
+						const stack = await stackActions.getStack.call(this, boardId, stackId);
+						returnData.push({
+							success: true,
+							operation: 'get',
+							resource: 'stack',
+							data: { stack },
+						});
+					} else if (operation === 'create') {
+						const boardId = this.getNodeParameter('boardId', i) as number;
+						const title = this.getNodeParameter('title', i) as string;
+						const order = this.getNodeParameter('order', i, 0) as number;
+						
+						const stackData = { title, boardId, order };
+						const stack = await stackActions.createStack.call(this, boardId, stackData);
+						returnData.push({
+							success: true,
+							operation: 'create',
+							resource: 'stack',
+							message: 'Stack erfolgreich erstellt',
+							data: { stack },
+						});
+					} else if (operation === 'update') {
+						const boardId = this.getNodeParameter('boardId', i) as number;
+						const stackId = this.getNodeParameter('stackId', i) as number;
+						const title = this.getNodeParameter('title', i, '') as string;
+						const order = this.getNodeParameter('order', i, 0) as number;
+						
+						const stackData: IStackUpdate = { id: stackId, boardId };
+						if (title) stackData.title = title;
+						if (order) stackData.order = order;
+						
+						const stack = await stackActions.updateStack.call(this, boardId, stackData);
+						returnData.push({
+							success: true,
+							operation: 'update',
+							resource: 'stack',
+							message: 'Stack erfolgreich aktualisiert',
+							data: { stack },
+						});
+					} else if (operation === 'delete') {
+						const boardId = this.getNodeParameter('boardId', i) as number;
+						const stackId = this.getNodeParameter('stackId', i) as number;
+						const response = await stackActions.deleteStack.call(this, boardId, stackId);
+						returnData.push({
+							success: true,
+							operation: 'delete',
+							resource: 'stack',
+							message: 'Stack erfolgreich gelöscht',
+							data: response,
 						});
 					}
 				} else if (resource === 'card') {
