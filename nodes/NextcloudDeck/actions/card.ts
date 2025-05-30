@@ -8,8 +8,10 @@ import { ICard } from '../interfaces/stack';
 import { ICardCreate, ICardUpdate, IComment, ICommentCreate } from '../interfaces/card';
 
 export async function getCards(this: IExecuteFunctions | ILoadOptionsFunctions, boardId: number, stackId: number): Promise<ICard[]> {
-	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks/${stackId}/cards`);
-	return response as unknown as ICard[];
+	// Da es keinen direkten Endpunkt für alle Karten gibt, holen wir den Stack und extrahieren die Karten
+	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks/${stackId}`);
+	const stack = response as unknown as { cards?: ICard[] };
+	return stack.cards || [];
 }
 
 export async function getCard(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number): Promise<ICard> {

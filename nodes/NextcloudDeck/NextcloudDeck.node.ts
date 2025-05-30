@@ -388,7 +388,8 @@ export class NextcloudDeck implements INodeType {
 							success: true,
 							operation: 'getAll',
 							resource: 'card',
-							data: { cards },
+							message: `${cards.length} Karten im Stack gefunden`,
+							data: { cards, boardId, stackId },
 						});
 					} else if (operation === 'get') {
 						const boardId = getResourceId(this.getNodeParameter('boardId', i));

@@ -47,7 +47,7 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 ### Card-Operationen (Karten)
 
-- **Alle Karten abrufen**: Listet alle Karten eines Stacks auf (mit Board- und Stack-Dropdown)
+- **Stack mit Karten abrufen**: Ruft einen Stack mit allen enthaltenen Karten ab (mit Board- und Stack-Dropdown)
 - **Karte abrufen**: Ruft eine spezifische Karte ab (mit Board-, Stack- und Card-Dropdown)
 - **Karte erstellen**: Erstellt eine neue Karte in einem Stack
   - Titel (erforderlich)
@@ -59,6 +59,8 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **Karte löschen**: Löscht eine Karte (mit Dropdown-Auswahl)
 - **Benutzer zuweisen**: Weist einen Benutzer zu einer Karte zu
 - **Benutzer entfernen**: Entfernt einen Benutzer von einer Karte
+
+> **Hinweis**: Die Nextcloud Deck API stellt keinen direkten Endpunkt zum Abrufen aller Karten eines Stacks bereit. Die Operation "Stack mit Karten abrufen" ruft stattdessen den Stack ab und extrahiert die darin enthaltenen Karten.
 
 ### UI-Verbesserungen
 

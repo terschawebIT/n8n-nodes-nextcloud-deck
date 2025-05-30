@@ -13,10 +13,10 @@ export const cardOperations: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Alle Karten Abrufen',
+				name: 'Stack mit Karten Abrufen',
 				value: 'getAll',
-				description: 'Alle Karten eines Stacks abrufen',
-				action: 'Alle Karten abrufen',
+				description: 'Stack abrufen mit allen enthaltenen Karten',
+				action: 'Stack mit Karten abrufen',
 			},
 			{
 				name: 'Karte Abrufen',
