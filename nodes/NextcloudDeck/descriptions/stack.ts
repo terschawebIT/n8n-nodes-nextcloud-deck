@@ -48,42 +48,89 @@ export const stackOperations: INodeProperties[] = [
 ];
 
 export const stackFields: INodeProperties[] = [
-	// Board-ID als Dropdown für alle Stack-Operationen
+	// Board-ID als resourceLocator für alle Stack-Operationen
 	{
 		displayName: 'Board',
 		name: 'boardId',
-		type: 'options',
-		typeOptions: {
-			loadOptionsMethod: 'getBoards',
-		},
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: true,
+		description: 'Wählen Sie ein Board aus der Liste oder geben Sie dessen ID an',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getBoards',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Board-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Board-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['stack'],
 			},
 		},
-		default: '',
-		description: 'Wählen Sie das Board aus',
 	},
 
-	// Stack-ID als Dropdown für get, update, delete
+	// Stack-ID als resourceLocator für get, update, delete
 	{
 		displayName: 'Stack',
 		name: 'stackId',
-		type: 'options',
-		typeOptions: {
-			loadOptionsMethod: 'getStacks',
-			loadOptionsDependsOn: ['boardId'],
-		},
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: true,
+		description: 'Wählen Sie einen Stack aus der Liste oder geben Sie dessen ID an',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getStacks',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Stack-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Stack-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['stack'],
 				operation: ['get', 'update', 'delete'],
 			},
 		},
-		default: '',
-		description: 'Wählen Sie den Stack aus',
 	},
 
 	// Titel für create

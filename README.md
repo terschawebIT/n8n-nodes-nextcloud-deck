@@ -47,9 +47,18 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 ### UI-Verbesserungen
 
-- **Dropdown-Listen**: Alle Board- und Stack-Auswahlen verwenden benutzerfreundliche Dropdown-Listen
+- **Resource Locator**: Flexible Auswahl zwischen Dropdown-Listen und direkter ID-Eingabe
+  - **Listen-Modus**: Benutzerfreundliche Dropdown-Listen mit Suchfunktion
+  - **ID-Modus**: Direkte Eingabe von Board- und Stack-IDs für Automatisierung
 - **Dynamische Listen**: Stack-Listen werden automatisch basierend auf der Board-Auswahl aktualisiert
 - **Intelligente Validierung**: Optionale Felder werden nur gesendet wenn sie Werte enthalten
+- **Suchfunktion**: Alle Listen sind durchsuchbar für bessere Benutzerfreundlichkeit
+
+### Flexibilität
+
+- **Hybrid-Auswahl**: Jedes Board/Stack-Feld kann sowohl über Liste als auch über ID ausgewählt werden
+- **API-Integration**: Perfekt für Workflows, die IDs aus anderen Systemen verwenden
+- **Benutzerfreundlichkeit**: Dropdown-Listen für manuelle Auswahl, ID-Eingabe für Automatisierung
 
 ### Geplante Funktionen
 

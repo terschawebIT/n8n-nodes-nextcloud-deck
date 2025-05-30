@@ -7,6 +7,7 @@ import {
 	INodeTypeDescription,
 	IDataObject,
 	NodeConnectionType,
+	INodeListSearchResult,
 } from 'n8n-workflow';
 
 // Importe der Aktionen
@@ -108,6 +109,73 @@ export class NextcloudDeck implements INodeType {
 				}
 			},
 		},
+		listSearch: {
+			async getBoards(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+				try {
+					const boards = await boardActions.getBoards.call(this);
+					if (!boards || boards.length === 0) {
+						return { results: [{ name: 'Keine Boards gefunden', value: '' }] };
+					}
+					
+					let filteredBoards = boards;
+					if (filter && filter.trim().length > 0) {
+						const normalized = filter.toLowerCase();
+						filteredBoards = boards.filter(board => 
+							board.title.toLowerCase().includes(normalized)
+						);
+					}
+					
+					return {
+						results: filteredBoards.map((board) => ({
+							name: board.title,
+							value: board.id?.toString() || '',
+						}))
+					};
+				} catch (_error) {
+					return { results: [{ name: 'Fehler beim Laden der Boards', value: '' }] };
+				}
+			},
+			async getStacks(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+				try {
+					// Holen der Board-ID aus resourceLocator
+					const boardParam = this.getCurrentNodeParameter('boardId');
+					let boardId: number;
+					
+					if (typeof boardParam === 'object' && boardParam !== null) {
+						const boardResourceLocator = boardParam as { mode: string; value: string };
+						boardId = parseInt(boardResourceLocator.value, 10);
+					} else {
+						boardId = parseInt(boardParam as string, 10);
+					}
+					
+					if (!boardId || isNaN(boardId)) {
+						return { results: [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }] };
+					}
+					
+					const stacks = await stackActions.getStacks.call(this, boardId);
+					if (!stacks || stacks.length === 0) {
+						return { results: [{ name: 'Keine Stacks gefunden', value: '' }] };
+					}
+					
+					let filteredStacks = stacks;
+					if (filter && filter.trim().length > 0) {
+						const normalized = filter.toLowerCase();
+						filteredStacks = stacks.filter(stack => 
+							stack.title.toLowerCase().includes(normalized)
+						);
+					}
+					
+					return {
+						results: filteredStacks.map((stack) => ({
+							name: stack.title,
+							value: stack.id?.toString() || '',
+						}))
+					};
+				} catch (_error) {
+					return { results: [{ name: 'Fehler beim Laden der Stacks', value: '' }] };
+				}
+			},
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -115,6 +183,15 @@ export class NextcloudDeck implements INodeType {
 		const returnData: IDataObject[] = [];
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
+
+		// Hilfsfunktion zum Extrahieren von resourceLocator-Werten
+		const getResourceId = (resourceParam: unknown): number => {
+			if (typeof resourceParam === 'object' && resourceParam !== null) {
+				const resourceLocator = resourceParam as { mode: string; value: string };
+				return parseInt(resourceLocator.value, 10);
+			}
+			return parseInt(resourceParam as string, 10);
+		};
 
 		for (let i = 0; i < items.length; i++) {
 			try {
@@ -129,7 +206,7 @@ export class NextcloudDeck implements INodeType {
 							data: { boards },
 						});
 					} else if (operation === 'get') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const board = await boardActions.getBoard.call(this, boardId);
 						returnData.push({
 							success: true,
@@ -151,7 +228,7 @@ export class NextcloudDeck implements INodeType {
 							data: { board },
 						});
 					} else if (operation === 'update') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const title = this.getNodeParameter('title', i, '') as string;
 						const color = this.getNodeParameter('color', i, '') as string;
 						
@@ -168,7 +245,7 @@ export class NextcloudDeck implements INodeType {
 							data: { board },
 						});
 					} else if (operation === 'delete') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const response = await boardActions.deleteBoard.call(this, boardId);
 						returnData.push({
 							success: true,
@@ -181,7 +258,7 @@ export class NextcloudDeck implements INodeType {
 				} else if (resource === 'stack') {
 					// Stack-Operationen
 					if (operation === 'getAll') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const stacks = await stackActions.getStacks.call(this, boardId);
 						returnData.push({
 							success: true,
@@ -190,8 +267,8 @@ export class NextcloudDeck implements INodeType {
 							data: { stacks },
 						});
 					} else if (operation === 'get') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
-						const stackId = parseInt(this.getNodeParameter('stackId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const stack = await stackActions.getStack.call(this, boardId, stackId);
 						returnData.push({
 							success: true,
@@ -200,7 +277,7 @@ export class NextcloudDeck implements INodeType {
 							data: { stack },
 						});
 					} else if (operation === 'create') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const title = this.getNodeParameter('title', i) as string;
 						const order = this.getNodeParameter('order', i, 0) as number;
 						
@@ -214,8 +291,8 @@ export class NextcloudDeck implements INodeType {
 							data: { stack },
 						});
 					} else if (operation === 'update') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
-						const stackId = parseInt(this.getNodeParameter('stackId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const title = this.getNodeParameter('title', i, '') as string;
 						const order = this.getNodeParameter('order', i, undefined) as number | undefined;
 						
@@ -232,8 +309,8 @@ export class NextcloudDeck implements INodeType {
 							data: { stack },
 						});
 					} else if (operation === 'delete') {
-						const boardId = parseInt(this.getNodeParameter('boardId', i) as string, 10);
-						const stackId = parseInt(this.getNodeParameter('stackId', i) as string, 10);
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const response = await stackActions.deleteStack.call(this, boardId, stackId);
 						returnData.push({
 							success: true,

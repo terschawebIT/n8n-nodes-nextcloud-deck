@@ -48,23 +48,47 @@ export const boardOperations: INodeProperties[] = [
 ];
 
 export const boardFields: INodeProperties[] = [
-	// Board-ID als Dropdown für get, update, delete
+	// Board-ID als resourceLocator für get, update, delete
 	{
 		displayName: 'Board',
 		name: 'boardId',
-		type: 'options',
-		typeOptions: {
-			loadOptionsMethod: 'getBoards',
-		},
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: true,
+		description: 'Wählen Sie ein Board aus der Liste oder geben Sie dessen ID an',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getBoards',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Board-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Board-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['board'],
 				operation: ['get', 'update', 'delete'],
 			},
 		},
-		default: '',
-		description: 'Wählen Sie das Board aus',
 	},
 
 	// Titel für create
