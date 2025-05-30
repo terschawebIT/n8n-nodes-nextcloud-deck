@@ -267,36 +267,23 @@ export class NodeListSearch {
 
 	static async getLabels(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
 		try {
-			console.log('getLabels aufgerufen mit filter:', filter);
-			
 			// Holen der Board-ID aus resourceLocator
 			const boardParam = this.getCurrentNodeParameter('boardId');
-			console.log('boardParam:', JSON.stringify(boardParam, null, 2));
-			
 			let boardId: number;
 			
 			if (typeof boardParam === 'object' && boardParam !== null) {
 				const boardResourceLocator = boardParam as { mode: string; value: string };
-				console.log('resourceLocator mode:', boardResourceLocator.mode);
-				console.log('resourceLocator value:', boardResourceLocator.value);
 				boardId = parseInt(boardResourceLocator.value, 10);
 			} else {
-				console.log('boardParam as string:', boardParam);
 				boardId = parseInt(boardParam as string, 10);
 			}
 			
-			console.log('Final boardId:', boardId);
-			
 			if (!boardId || isNaN(boardId)) {
-				console.log('Board-ID ist ungültig oder nicht gesetzt');
 				return { results: [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }] };
 			}
 			
 			const labels = await boardActions.getLabels.call(this, boardId);
-			console.log('Geladene Labels:', labels);
-			
 			if (!labels || labels.length === 0) {
-				console.log('Keine Labels gefunden für Board:', boardId);
 				return { results: [{ name: 'Keine Labels gefunden', value: '' }] };
 			}
 			
@@ -306,7 +293,6 @@ export class NodeListSearch {
 				filteredLabels = labels.filter(label => 
 					label.title.toLowerCase().includes(normalized)
 				);
-				console.log('Gefilterte Labels:', filteredLabels);
 			}
 			
 			const results = filteredLabels.map((label) => ({
@@ -314,11 +300,8 @@ export class NodeListSearch {
 				value: label.id?.toString() || '',
 			}));
 			
-			console.log('Final results:', results);
-			
 			return { results };
-		} catch (error) {
-			console.error('Fehler in getLabels searchListMethod:', error);
+		} catch (_error) {
 			return { results: [{ name: 'Fehler beim Laden der Labels', value: '' }] };
 		}
 	}

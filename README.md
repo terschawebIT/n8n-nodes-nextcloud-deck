@@ -56,14 +56,14 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
   - Reihenfolge im Stack (optional)
   - Fälligkeitsdatum (optional)
   - **🆕 Benutzer zuweisen** (optional) - Direkte Benutzerzuweisung bei Erstellung
-  - **🆕 Labels zuweisen** (optional) - Direkte Label-Zuweisung bei Erstellung
 - **Karte aktualisieren**: Aktualisiert eine vorhandene Karte (mit Dropdown-Auswahl)
   - Alle Felder optional
   - **🆕 Benutzer zuweisen** (optional) - Zusätzlichen Benutzer zuweisen
-  - **🆕 Labels zuweisen** (optional) - Zusätzliche Labels zuweisen
 - **Karte löschen**: Löscht eine Karte (mit Dropdown-Auswahl)
 - **Benutzer zuweisen**: Weist einen Benutzer zu einer Karte zu
 - **Benutzer entfernen**: Entfernt einen Benutzer von einer Karte
+
+> **⚠️ Hinweis zu Labels**: Die direkte Label-Zuweisung bei Kartenerstellung/-aktualisierung ist temporär deaktiviert aufgrund von UI-Kompatibilitätsproblemen. Verwenden Sie stattdessen die separaten Label-Operationen "Label zu Karte zuweisen".
 
 ### Label-Operationen (Tags/Etiketten)
 
@@ -78,7 +78,17 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **🆕 Label zu Karte zuweisen**: Weist ein Label zu einer Karte zu
 - **🆕 Label von Karte entfernen**: Entfernt ein Label von einer Karte
 
-> **Hinweis**: Die Nextcloud Deck API stellt keinen direkten Endpunkt zum Abrufen aller Karten eines Stacks bereit. Die Operation "Stack mit Karten abrufen" ruft stattdessen den Stack ab und extrahiert die darin enthaltenen Karten.
+### Comment-Operationen (Kommentare)
+
+- **🆕 Alle Kommentare Abrufen**: Listet alle Kommentare einer Karte auf
+- **🆕 Kommentar Abrufen**: Ruft einen spezifischen Kommentar ab
+- **🆕 Kommentar Erstellen**: Erstellt einen neuen Kommentar an einer Karte
+  - Nachricht (erforderlich, mehrzeilig)
+- **🆕 Kommentar Aktualisieren**: Aktualisiert einen vorhandenen Kommentar
+  - Neue Nachricht (erforderlich)
+- **🆕 Kommentar Löschen**: Löscht einen Kommentar
+
+> **Hinweis**: Kommentare werden über die Nextcloud OCS Comments API verwaltet und erfordern entsprechende Berechtigungen.
 
 ### UI-Verbesserungen
 
@@ -105,8 +115,8 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 
 ### Geplante Funktionen
 
-- Kommentar-System (OCS API bereits vorbereitet)
 - Anhänge verwalten
+- ~~Kommentar-System~~ ✅ **Implementiert!**
 
 ## API-Dokumentation
 

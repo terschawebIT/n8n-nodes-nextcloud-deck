@@ -2,9 +2,11 @@ import { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 import * as boardActions from '../actions/board';
 import * as stackActions from '../actions/stack';
 import * as cardActions from '../actions/card';
+import * as commentActions from '../actions/comment';
 import { IBoardUpdate } from '../interfaces/board';
 import { IStackUpdate } from '../interfaces/stack';
 import { ICardUpdate, ILabelCreate, ILabelUpdate } from '../interfaces/card';
+import { ICommentCreate, ICommentUpdate } from '../interfaces/comment';
 
 // Hilfsfunktion zum Extrahieren von resourceLocator-Werten
 export const getResourceId = (resourceParam: unknown): number => {
@@ -198,7 +200,6 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
-			const assignLabels = this.getNodeParameter('assignLabels', i, []) as string[];
 			
 			const cardData: { title: string; type?: string; order?: number; description?: string; duedate?: string } = { title };
 			if (description) cardData.description = description;
@@ -222,19 +223,6 @@ export class CardHandler {
 				}
 			}
 			
-			// Optional: Labels zuweisen, falls angegeben
-			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-				for (const labelId of assignLabels) {
-					if (labelId) {
-						try {
-							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, parseInt(labelId, 10));
-						} catch (labelError) {
-							// Stille Fehlerbehandlung - Karte wurde trotzdem erstellt
-						}
-					}
-				}
-			}
-			
 			return {
 				success: true,
 				operation: 'create',
@@ -242,9 +230,6 @@ export class CardHandler {
 				message: (() => {
 					let msg = 'Karte erfolgreich erstellt';
 					if (assignUser && getResourceString(assignUser)) msg += ' und Benutzer zugewiesen';
-					if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-						msg += ` und ${assignLabels.length} Label(s) zugewiesen`;
-					}
 					return msg;
 				})(),
 				data: { card },
@@ -259,7 +244,6 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
-			const assignLabels = this.getNodeParameter('assignLabels', i, []) as string[];
 			
 			// Wenn order = 0, holen wir die aktuelle Reihenfolge
 			let finalOrder = order;
@@ -289,19 +273,6 @@ export class CardHandler {
 				}
 			}
 			
-			// Optional: Labels zuweisen, falls angegeben
-			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-				for (const labelId of assignLabels) {
-					if (labelId) {
-						try {
-							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, parseInt(labelId, 10));
-						} catch (labelError) {
-							// Stille Fehlerbehandlung - Karte wurde trotzdem aktualisiert
-						}
-					}
-				}
-			}
-			
 			return {
 				success: true,
 				operation: 'update',
@@ -309,9 +280,6 @@ export class CardHandler {
 				message: (() => {
 					let msg = 'Karte erfolgreich aktualisiert';
 					if (assignUser && getResourceString(assignUser)) msg += ' und Benutzer zugewiesen';
-					if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-						msg += ` und ${assignLabels.length} Label(s) zugewiesen`;
-					}
 					return msg;
 				})(),
 				data: { card },
@@ -455,6 +423,69 @@ export class LabelHandler {
 				operation: 'removeFromCard',
 				resource: 'label',
 				message: 'Label erfolgreich von Karte entfernt',
+				data: response,
+			};
+		}
+		
+		throw new Error(`Unbekannte Operation: ${operation}`);
+	}
+}
+
+export class CommentHandler {
+	static async execute(this: IExecuteFunctions, operation: string, i: number): Promise<IDataObject> {
+		if (operation === 'getAll') {
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const comments = await commentActions.getComments.call(this, cardId);
+			return {
+				success: true,
+				operation: 'getAll',
+				resource: 'comment',
+				message: `${comments.length} Kommentare in der Karte gefunden`,
+				data: { comments, cardId },
+			};
+		} else if (operation === 'get') {
+			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
+			const comment = await commentActions.getComment.call(this, commentId);
+			return {
+				success: true,
+				operation: 'get',
+				resource: 'comment',
+				data: { comment },
+			};
+		} else if (operation === 'create') {
+			const cardId = getResourceId(this.getNodeParameter('cardId', i));
+			const message = this.getNodeParameter('message', i) as string;
+			
+			const commentData: ICommentCreate = { message };
+			const comment = await commentActions.createComment.call(this, cardId, commentData);
+			return {
+				success: true,
+				operation: 'create',
+				resource: 'comment',
+				message: 'Kommentar erfolgreich erstellt',
+				data: { comment },
+			};
+		} else if (operation === 'update') {
+			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
+			const message = this.getNodeParameter('message', i) as string;
+			
+			const commentData: ICommentUpdate = { message };
+			const comment = await commentActions.updateComment.call(this, commentId, commentData);
+			return {
+				success: true,
+				operation: 'update',
+				resource: 'comment',
+				message: 'Kommentar erfolgreich aktualisiert',
+				data: { comment },
+			};
+		} else if (operation === 'delete') {
+			const commentId = parseInt(this.getNodeParameter('commentId', i) as string, 10);
+			const response = await commentActions.deleteComment.call(this, commentId);
+			return {
+				success: true,
+				operation: 'delete',
+				resource: 'comment',
+				message: 'Kommentar erfolgreich gelöscht',
 				data: response,
 			};
 		}

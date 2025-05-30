@@ -319,26 +319,6 @@ export const cardFields: INodeProperties[] = [
 		},
 	},
 
-	// Labels zuweisen für create (optional)
-	{
-		displayName: 'Labels zuweisen',
-		name: 'assignLabels',
-		type: 'multiOptions',
-		default: [],
-		required: false,
-		description: 'Optional: Weisen Sie direkt Labels zu dieser neuen Karte zu',
-		typeOptions: {
-			searchListMethod: 'getLabels',
-			loadOptionsMethod: 'getLabels',
-		},
-		displayOptions: {
-			show: {
-				resource: ['card'],
-				operation: ['create'],
-			},
-		},
-	},
-
 	// Felder für update
 	{
 		displayName: 'Neuer Titel',
@@ -462,26 +442,6 @@ export const cardFields: INodeProperties[] = [
 				],
 			},
 		],
-		displayOptions: {
-			show: {
-				resource: ['card'],
-				operation: ['update'],
-			},
-		},
-	},
-
-	// Labels zuweisen für update (optional)
-	{
-		displayName: 'Labels zuweisen',
-		name: 'assignLabels',
-		type: 'multiOptions',
-		default: [],
-		required: false,
-		description: 'Optional: Weisen Sie zusätzliche Labels zu dieser Karte zu',
-		typeOptions: {
-			searchListMethod: 'getLabels',
-			loadOptionsMethod: 'getLabels',
-		},
 		displayOptions: {
 			show: {
 				resource: ['card'],

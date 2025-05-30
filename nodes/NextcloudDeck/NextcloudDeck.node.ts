@@ -11,21 +11,11 @@ import {
 } from 'n8n-workflow';
 
 // Modulare Handler importieren
-import { BoardHandler, StackHandler, CardHandler, LabelHandler } from './handlers/resource.handlers';
+import { BoardHandler, StackHandler, CardHandler, LabelHandler, CommentHandler } from './handlers/resource.handlers';
 import { NodeLoadOptions, NodeListSearch } from './helpers/node.methods';
 
 // Beschreibungen importieren
-import {
-	resources,
-	boardOperations,
-	boardFields,
-	stackOperations,
-	stackFields,
-	cardOperations,
-	cardFields,
-	labelOperations,
-	labelFields,
-} from './descriptions';
+import { nodeProperties } from './descriptions';
 
 export class NextcloudDeck implements INodeType {
 	description: INodeTypeDescription = {
@@ -48,22 +38,7 @@ export class NextcloudDeck implements INodeType {
 				displayName: 'Nextcloud Deck API',
 			},
 		],
-		properties: [
-			// Ressource: Board, Stack, Card oder Label
-			...resources,
-
-			// Operationen
-			...boardOperations,
-			...stackOperations,
-			...cardOperations,
-			...labelOperations,
-
-			// Feld-Definitionen
-			...boardFields,
-			...stackFields,
-			...cardFields,
-			...labelFields,
-		],
+		properties: nodeProperties,
 	};
 
 	methods = {
@@ -120,6 +95,9 @@ export class NextcloudDeck implements INodeType {
 						break;
 					case 'label':
 						result = await LabelHandler.execute.call(this, operation, i);
+						break;
+					case 'comment':
+						result = await CommentHandler.execute.call(this, operation, i);
 						break;
 					default:
 						throw new Error(`Unbekannte Ressource: ${resource}`);
