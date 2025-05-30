@@ -276,6 +276,49 @@ export const cardFields: INodeProperties[] = [
 		description: 'Das Fälligkeitsdatum der Karte (optional)',
 	},
 
+	// Benutzer zuweisen für create (optional)
+	{
+		displayName: 'Benutzer zuweisen',
+		name: 'assignUser',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: false,
+		description: 'Optional: Weisen Sie direkt einen Benutzer zu dieser neuen Karte zu',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getUsers',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Benutzer-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[a-zA-Z0-9._@-]+$',
+							errorMessage: 'Bitte eine gültige Benutzer-ID eingeben',
+						},
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['card'],
+				operation: ['create'],
+			},
+		},
+	},
+
 	// Felder für update
 	{
 		displayName: 'Neuer Titel',
@@ -362,6 +405,49 @@ export const cardFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Das neue Fälligkeitsdatum der Karte (leer lassen wenn nicht ändern)',
+	},
+
+	// Benutzer zuweisen für update (optional)
+	{
+		displayName: 'Benutzer zuweisen',
+		name: 'assignUser',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		required: false,
+		description: 'Optional: Weisen Sie einen zusätzlichen Benutzer zu dieser Karte zu',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getUsers',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Benutzer-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[a-zA-Z0-9._@-]+$',
+							errorMessage: 'Bitte eine gültige Benutzer-ID eingeben',
+						},
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['card'],
+				operation: ['update'],
+			},
+		},
 	},
 
 	// Benutzer-ID für assignUser und unassignUser

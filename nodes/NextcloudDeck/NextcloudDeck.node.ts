@@ -486,6 +486,7 @@ export class NextcloudDeck implements INodeType {
 						const type = this.getNodeParameter('type', i, 'plain') as string;
 						const order = this.getNodeParameter('order', i, 0) as number;
 						const duedate = this.getNodeParameter('duedate', i, '') as string;
+						const assignUser = this.getNodeParameter('assignUser', i, '') as string;
 						
 						const cardData: { title: string; type?: string; order?: number; description?: string; duedate?: string } = { title };
 						if (description) cardData.description = description;
@@ -494,11 +495,27 @@ export class NextcloudDeck implements INodeType {
 						if (duedate) cardData.duedate = duedate;
 						
 						const card = await cardActions.createCard.call(this, boardId, stackId, cardData);
+						
+						// Optional: Benutzer zuweisen, falls angegeben
+						if (assignUser) {
+							const userId = getResourceString(assignUser);
+							if (userId) {
+								try {
+									await cardActions.assignUserToCard.call(this, boardId, stackId, (card as { id: number }).id, userId);
+								} catch (assignError) {
+									// Fehler bei Benutzerzuweisung loggen, aber Karte wurde erfolgreich erstellt
+									console.warn('Karte erstellt, aber Benutzerzuweisung fehlgeschlagen:', assignError);
+								}
+							}
+						}
+						
 						returnData.push({
 							success: true,
 							operation: 'create',
 							resource: 'card',
-							message: 'Karte erfolgreich erstellt',
+							message: assignUser && getResourceString(assignUser) ? 
+								'Karte erfolgreich erstellt und Benutzer zugewiesen' : 
+								'Karte erfolgreich erstellt',
 							data: { card },
 						});
 					} else if (operation === 'update') {
@@ -510,6 +527,7 @@ export class NextcloudDeck implements INodeType {
 						const type = this.getNodeParameter('type', i, '') as string;
 						const order = this.getNodeParameter('order', i, 0) as number;
 						const duedate = this.getNodeParameter('duedate', i, '') as string;
+						const assignUser = this.getNodeParameter('assignUser', i, '') as string;
 						
 						// Wenn order = 0, holen wir die aktuelle Reihenfolge
 						let finalOrder = order;
@@ -525,11 +543,27 @@ export class NextcloudDeck implements INodeType {
 						if (duedate) cardData.duedate = duedate;
 						
 						const card = await cardActions.updateCard.call(this, boardId, stackId, cardData);
+						
+						// Optional: Benutzer zuweisen, falls angegeben
+						if (assignUser) {
+							const userId = getResourceString(assignUser);
+							if (userId) {
+								try {
+									await cardActions.assignUserToCard.call(this, boardId, stackId, cardId, userId);
+								} catch (assignError) {
+									// Fehler bei Benutzerzuweisung loggen, aber Karte wurde erfolgreich aktualisiert
+									console.warn('Karte aktualisiert, aber Benutzerzuweisung fehlgeschlagen:', assignError);
+								}
+							}
+						}
+						
 						returnData.push({
 							success: true,
 							operation: 'update',
 							resource: 'card',
-							message: 'Karte erfolgreich aktualisiert',
+							message: assignUser && getResourceString(assignUser) ? 
+								'Karte erfolgreich aktualisiert und Benutzer zugewiesen' : 
+								'Karte erfolgreich aktualisiert',
 							data: { card },
 						});
 					} else if (operation === 'delete') {
