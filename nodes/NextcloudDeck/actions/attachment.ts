@@ -1,6 +1,7 @@
 import { IExecuteFunctions } from 'n8n-workflow';
-import { nextcloudDeckApiRequest } from '../helpers/api';
+import { nextcloudDeckApiRequest, nextcloudDeckFileUploadRequest } from '../helpers/api';
 import { IAttachment, IAttachmentCreate, IAttachmentUpdate } from '../interfaces/attachment';
+import FormData from 'form-data';
 
 export async function getAttachments(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number): Promise<IAttachment[]> {
 	// GET /boards/{boardId}/stacks/{stackId}/cards/{cardId}/attachments
@@ -41,11 +42,32 @@ export async function getAttachment(this: IExecuteFunctions, boardId: number, st
 export async function createAttachment(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number, attachmentData: IAttachmentCreate): Promise<IAttachment> {
 	// POST /boards/{boardId}/stacks/{stackId}/cards/{cardId}/attachments
 	const endpoint = `/boards/${boardId}/stacks/${stackId}/cards/${cardId}/attachments`;
-	const body = {
-		type: attachmentData.type,
-		data: attachmentData.data
-	};
-	const response = await nextcloudDeckApiRequest.call(this, 'POST', endpoint, body);
+	
+	console.log(`DEBUG: Creating attachment with data:`, attachmentData);
+	
+	// Für File-Uploads müssen wir FormData verwenden
+	const formData = new FormData();
+	formData.append('type', attachmentData.type);
+	
+	// Je nach Typ unterschiedlich handhaben
+	if (attachmentData.type === 'file') {
+		// Für Nextcloud-Dateien wird der Dateipfad erwartet
+		formData.append('data', attachmentData.data);
+	} else {
+		// Für deck_file muss eine echte Datei hochgeladen werden
+		// Erstelle einen Buffer aus den Daten
+		const buffer = Buffer.from(attachmentData.data, 'utf8');
+		formData.append('file', buffer, {
+			filename: 'attachment.txt',
+			contentType: 'text/plain',
+		});
+	}
+	
+	console.log(`DEBUG: FormData prepared for endpoint: ${endpoint}`);
+	
+	const response = await nextcloudDeckFileUploadRequest.call(this, 'POST', endpoint, formData);
+	console.log(`DEBUG: Create attachment response:`, JSON.stringify(response, null, 2));
+	
 	return response as unknown as IAttachment;
 }
 
