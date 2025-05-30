@@ -198,7 +198,7 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
-			const assignLabels = this.getNodeParameter('assignLabels', i, []) as unknown[];
+			const assignLabels = this.getNodeParameter('assignLabels', i, []) as string[];
 			
 			const cardData: { title: string; type?: string; order?: number; description?: string; duedate?: string } = { title };
 			if (description) cardData.description = description;
@@ -224,11 +224,10 @@ export class CardHandler {
 			
 			// Optional: Labels zuweisen, falls angegeben
 			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-				for (const labelParam of assignLabels) {
-					const labelId = getResourceId(labelParam);
+				for (const labelId of assignLabels) {
 					if (labelId) {
 						try {
-							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, labelId);
+							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, parseInt(labelId, 10));
 						} catch (labelError) {
 							// Stille Fehlerbehandlung - Karte wurde trotzdem erstellt
 						}
@@ -260,7 +259,7 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
-			const assignLabels = this.getNodeParameter('assignLabels', i, []) as unknown[];
+			const assignLabels = this.getNodeParameter('assignLabels', i, []) as string[];
 			
 			// Wenn order = 0, holen wir die aktuelle Reihenfolge
 			let finalOrder = order;
@@ -292,11 +291,10 @@ export class CardHandler {
 			
 			// Optional: Labels zuweisen, falls angegeben
 			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
-				for (const labelParam of assignLabels) {
-					const labelId = getResourceId(labelParam);
+				for (const labelId of assignLabels) {
 					if (labelId) {
 						try {
-							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, labelId);
+							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, parseInt(labelId, 10));
 						} catch (labelError) {
 							// Stille Fehlerbehandlung - Karte wurde trotzdem aktualisiert
 						}
