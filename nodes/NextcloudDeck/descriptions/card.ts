@@ -193,6 +193,10 @@ export const cardFields: INodeProperties[] = [
 		name: 'title',
 		type: 'string',
 		required: true,
+		typeOptions: {
+			canBeExpression: true,
+			AIEnabled: true,
+		},
 		displayOptions: {
 			show: {
 				resource: ['card'],
@@ -201,6 +205,7 @@ export const cardFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der Titel der neuen Karte',
+		placeholder: 'Aufgabentitel eingeben...',
 	},
 
 	// Beschreibung für create (optional)
@@ -208,8 +213,10 @@ export const cardFields: INodeProperties[] = [
 		displayName: 'Beschreibung',
 		name: 'description',
 		type: 'string',
+		required: false,
 		typeOptions: {
-			rows: 4,
+			canBeExpression: true,
+			AIEnabled: true,
 		},
 		displayOptions: {
 			show: {
@@ -219,6 +226,7 @@ export const cardFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Die Beschreibung der neuen Karte (optional)',
+		placeholder: 'Detaillierte Beschreibung der Aufgabe...',
 	},
 
 	// Typ für create (optional)
@@ -324,6 +332,10 @@ export const cardFields: INodeProperties[] = [
 		displayName: 'Neuer Titel',
 		name: 'title',
 		type: 'string',
+		typeOptions: {
+			canBeExpression: true,
+			AIEnabled: true,
+		},
 		displayOptions: {
 			show: {
 				resource: ['card'],
@@ -332,14 +344,17 @@ export const cardFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der neue Titel der Karte (leer lassen wenn nicht ändern)',
+		placeholder: 'Neuer Aufgabentitel...',
 	},
 
 	{
 		displayName: 'Neue Beschreibung',
 		name: 'description',
 		type: 'string',
+		required: false,
 		typeOptions: {
-			rows: 4,
+			canBeExpression: true,
+			AIEnabled: true,
 		},
 		displayOptions: {
 			show: {
@@ -349,6 +364,7 @@ export const cardFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Die neue Beschreibung der Karte (leer lassen wenn nicht ändern)',
+		placeholder: 'Aktualisierte Beschreibung der Aufgabe...',
 	},
 
 	{

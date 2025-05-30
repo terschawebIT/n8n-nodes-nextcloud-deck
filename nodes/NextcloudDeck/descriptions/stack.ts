@@ -139,6 +139,10 @@ export const stackFields: INodeProperties[] = [
 		name: 'title',
 		type: 'string',
 		required: true,
+		typeOptions: {
+			canBeExpression: true,
+			AIEnabled: true,
+		},
 		displayOptions: {
 			show: {
 				resource: ['stack'],
@@ -147,6 +151,7 @@ export const stackFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der Titel des neuen Stacks',
+		placeholder: 'Stack-Name eingeben (z.B. "To Do", "In Progress", "Done")...',
 	},
 
 	// Reihenfolge für create (optional)
@@ -169,6 +174,10 @@ export const stackFields: INodeProperties[] = [
 		displayName: 'Neuer Titel',
 		name: 'title',
 		type: 'string',
+		typeOptions: {
+			canBeExpression: true,
+			AIEnabled: true,
+		},
 		displayOptions: {
 			show: {
 				resource: ['stack'],
@@ -177,6 +186,7 @@ export const stackFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der neue Titel des Stacks (leer lassen wenn nicht ändern)',
+		placeholder: 'Neuer Stack-Name...',
 	},
 
 	{

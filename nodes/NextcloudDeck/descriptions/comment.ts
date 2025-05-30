@@ -197,7 +197,8 @@ export const commentFields: INodeProperties[] = [
 		name: 'message',
 		type: 'string',
 		typeOptions: {
-			rows: 4,
+			canBeExpression: true,
+			AIEnabled: true,
 		},
 		required: true,
 		displayOptions: {
@@ -208,6 +209,7 @@ export const commentFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der Inhalt des Kommentars',
+		placeholder: 'Schreiben Sie hier Ihren Kommentar...',
 	},
 
 	// Nachricht für update
@@ -216,7 +218,8 @@ export const commentFields: INodeProperties[] = [
 		name: 'message',
 		type: 'string',
 		typeOptions: {
-			rows: 4,
+			canBeExpression: true,
+			AIEnabled: true,
 		},
 		required: true,
 		displayOptions: {
@@ -227,5 +230,6 @@ export const commentFields: INodeProperties[] = [
 		},
 		default: '',
 		description: 'Der neue Inhalt des Kommentars',
+		placeholder: 'Aktualisierter Kommentartext...',
 	},
 ]; 

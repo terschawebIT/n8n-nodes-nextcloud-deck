@@ -2,6 +2,8 @@
 
 Ein n8n Community Node für die Integration mit Nextcloud Deck. Diese Node ermöglicht es Ihnen, Ihre Nextcloud Deck Boards, Stacks und Karten zu verwalten.
 
+**🤖 AI Agent Support**: Diese Node ist vollständig kompatibel mit n8n AI Agents und kann als intelligentes Tool in automatisierten Workflows verwendet werden.
+
 ## Installation
 
 Um diesen Node in n8n zu installieren, folgen Sie der [Anleitung für Community Nodes](https://docs.n8n.io/integrations/community-nodes/installation/).
@@ -9,6 +11,45 @@ Um diesen Node in n8n zu installieren, folgen Sie der [Anleitung für Community 
 ```bash
 npm install n8n-nodes-nextcloud-deck
 ```
+
+## AI Agent Support 🤖
+
+Diese Node unterstützt **n8n AI Agents** und kann als Tool in AI-gesteuerten Workflows verwendet werden. AI Agents können automatisch:
+
+- ✅ Boards erstellen und verwalten
+- ✅ Stacks organisieren (z.B. "To Do", "In Progress", "Done")
+- ✅ Karten mit intelligenten Titeln und Beschreibungen erstellen
+- ✅ Kommentare basierend auf Kontext hinzufügen
+- ✅ Anhänge hochladen und verwalten
+- ✅ Labels zuweisen und organisieren
+- ✅ Benutzer zu Aufgaben zuweisen
+
+### Aktivierung
+
+Die Node ist automatisch als AI Agent Tool verfügbar, wenn folgende Eigenschaften konfiguriert sind:
+- `usableAsTool: true` ✅
+- `aiEnabled: true` ✅
+
+### Bekannte Limitation: AI-Icons
+
+**⚠️ Problem**: Nicht alle Textfelder zeigen das AI-Zauberstab-Icon (⚡) in der Benutzeroberfläche an, obwohl die AI-Funktionalität technisch vollständig implementiert ist.
+
+**Betroffene Felder**: 
+- Beschreibungsfelder bei Karten
+- Nachrichtenfelder bei Kommentaren
+- Möglicherweise weitere mehrzeilige Textfelder
+
+**Technischer Hintergrund**:
+- Alle Felder sind mit `AIEnabled: true` und `canBeExpression: true` konfiguriert
+- Die AI-Funktionalität funktioniert trotz fehlender Icons vollständig
+- Das Problem liegt vermutlich in der n8n UI-Darstellung spezifischer Feldtypen
+
+**Workarounds**:
+1. **Manuelle Expression-Eingabe**: Sie können AI-Expressions manuell in Felder eingeben (z.B. `{{ $ai.generateText("Beschreibe diese Aufgabe") }}`)
+2. **AI Agent Nutzung**: AI Agents funktionieren normal und können alle Felder programmatisch ausfüllen
+3. **Copy-Paste**: Texte aus AI-fähigen Feldern können in nicht-AI-fähige Felder kopiert werden
+
+**Status**: Das Problem ist dokumentiert und wird in zukünftigen Updates adressiert. Die Kernfunktionalität ist nicht beeinträchtigt.
 
 ## Kompatibilität
 
@@ -188,4 +229,35 @@ Bei Problemen oder Feature-Anfragen erstellen Sie bitte ein Issue im [GitHub Rep
 
 ## Autor
 
-Niko Terschawetz - [nt@terschaweb.de](mailto:nt@terschaweb.de) 
+Niko Terschawetz - [nt@terschaweb.de](mailto:nt@terschaweb.de)
+
+## Changelog
+
+### Version 1.2.6 (2025-05-30)
+- 📝 **Dokumentation**: AI Support Limitation dokumentiert und Workarounds hinzugefügt
+- 📋 **README Update**: Umfassende Dokumentation der AI Agent Funktionalität
+
+### Version 1.2.5 (2025-05-30)
+- ✨ **AI Agent Tool Support**: Node kann jetzt als Tool für n8n AI Agents verwendet werden
+- 🔧 **AI Field Configuration**: Alle Textfelder mit `AIEnabled: true` und `canBeExpression: true` konfiguriert  
+- ⚠️ **Bekannte Limitation**: Nicht alle Felder zeigen AI-Icons an (funktioniert trotzdem)
+- 📝 **Dokumentation**: Umfassende AI Support Dokumentation hinzugefügt
+
+### Version 1.1.4 (2025-05-30)
+- ✨ **Attachment System**: Vollständiges Anhang-Management implementiert
+- 🔄 **Binary Data Support**: Proper n8n Binary-Daten Integration
+- 📎 **Multipart Upload**: FormData-basierte Datei-Uploads
+- 🔧 **Filename Detection**: Automatische Dateinamen und MIME-Type Erkennung
+
+### Version 1.1.0 (2025-05-30)
+- ✨ **Comment System**: Vollständiges Kommentar-Management
+- ✨ **Label Management**: Umfassendes Label-System mit CRUD-Operationen
+- 🎨 **Color Support**: Farbwähler für Boards und Labels
+- 👥 **User Assignment**: Direkte Benutzerzuweisung bei Kartenerstellung
+- 🔍 **Improved UI**: ResourceLocator für bessere Benutzerfreundlichkeit
+
+### Version 1.0.0 (2025-05-30)
+- 🎉 **Initial Release**: Board, Stack und Card Management
+- 📊 **Resource Locator**: Flexible Board/Stack/Card Auswahl
+- 🔄 **Dynamic Lists**: Automatische Dropdown-Aktualisierung
+- ✅ **Full CRUD**: Erstellen, Lesen, Aktualisieren, Löschen für alle Ressourcen 

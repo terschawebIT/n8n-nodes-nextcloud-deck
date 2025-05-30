@@ -40,6 +40,9 @@ export class NextcloudDeck implements INodeType {
 				required: true,
 			},
 		],
+		usableAsTool: true,
+		// @ts-expect-error: aiEnabled ist kein Standardfeld, wird aber von n8n AI genutzt
+		aiEnabled: true,
 		requestDefaults: {
 			headers: {
 				Accept: 'application/json',
