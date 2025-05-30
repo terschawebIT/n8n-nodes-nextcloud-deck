@@ -39,7 +39,7 @@ export async function getAttachment(this: IExecuteFunctions, boardId: number, st
 	return attachment;
 }
 
-export async function createAttachment(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number, attachmentData: IAttachmentCreate): Promise<IAttachment> {
+export async function createAttachment(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number, attachmentData: IAttachmentCreate, itemIndex: number = 0): Promise<IAttachment> {
 	// POST /boards/{boardId}/stacks/{stackId}/cards/{cardId}/attachments
 	const endpoint = `/boards/${boardId}/stacks/${stackId}/cards/${cardId}/attachments`;
 	
@@ -54,12 +54,40 @@ export async function createAttachment(this: IExecuteFunctions, boardId: number,
 		// Für Nextcloud-Dateien wird der Dateipfad erwartet
 		formData.append('data', attachmentData.data);
 	} else {
-		// Für deck_file muss eine echte Datei hochgeladen werden
-		// Erstelle einen Buffer aus den Daten
-		const buffer = Buffer.from(attachmentData.data, 'utf8');
-		formData.append('file', buffer, {
-			filename: 'attachment.txt',
-			contentType: 'text/plain',
+		// Für deck_file müssen wir die tatsächliche Datei aus dem Input verwenden
+		const items = this.getInputData();
+		const item = items[itemIndex];
+		
+		let filename = 'attachment.txt';
+		let fileBuffer: Buffer;
+		let contentType = 'text/plain';
+		
+		// Versuche zuerst Binary-Daten zu finden
+		if (item.binary && Object.keys(item.binary).length > 0) {
+			const binaryKey = Object.keys(item.binary)[0];
+			const binaryData = item.binary[binaryKey];
+			
+			filename = binaryData.fileName || 'attachment';
+			contentType = binaryData.mimeType || 'application/octet-stream';
+			
+			// Binary-Daten aus n8n abrufen
+			const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryKey);
+			fileBuffer = binaryDataBuffer;
+			
+			console.log(`DEBUG: Using binary data from key '${binaryKey}', filename: ${filename}, contentType: ${contentType}, size: ${fileBuffer.length}`);
+		} else {
+			// Fallback: Verwende den data-Parameter als Textinhalt
+			const content = attachmentData.data || 'Anhang-Inhalt';
+			fileBuffer = Buffer.from(content, 'utf8');
+			filename = 'attachment.txt';
+			contentType = 'text/plain';
+			
+			console.log(`DEBUG: No binary data found, using text content: "${content}"`);
+		}
+		
+		formData.append('file', fileBuffer, {
+			filename: filename,
+			contentType: contentType,
 		});
 	}
 	

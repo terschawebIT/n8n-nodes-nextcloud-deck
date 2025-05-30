@@ -231,8 +231,8 @@ export const attachmentFields: INodeProperties[] = [
 			},
 		},
 		default: '',
-		description: 'Der Dateipfad oder Dateiinhalt für den Anhang',
-		placeholder: 'z.B. /path/to/file.pdf oder file-content',
+		description: 'Für "Nextcloud-Datei": Dateipfad in Nextcloud (z.B. /Documents/file.pdf). Für "Deck-Datei": Wird bei Binärdaten ignoriert, andernfalls als Textinhalt verwendet.',
+		placeholder: 'z.B. /Documents/file.pdf oder Textinhalt',
 	},
 
 	// Daten für update (optional)

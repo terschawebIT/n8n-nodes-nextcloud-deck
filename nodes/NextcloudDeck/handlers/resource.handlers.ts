@@ -533,7 +533,7 @@ export class AttachmentHandler {
 			const data = this.getNodeParameter('data', i) as string;
 			
 			const attachmentData: IAttachmentCreate = { type, data };
-			const attachment = await attachmentActions.createAttachment.call(this, boardId, stackId, cardId, attachmentData);
+			const attachment = await attachmentActions.createAttachment.call(this, boardId, stackId, cardId, attachmentData, i);
 			return {
 				success: true,
 				operation: 'create',
