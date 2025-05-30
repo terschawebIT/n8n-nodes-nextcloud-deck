@@ -319,6 +319,53 @@ export const cardFields: INodeProperties[] = [
 		},
 	},
 
+	// Labels zuweisen für create (optional)
+	{
+		displayName: 'Labels zuweisen',
+		name: 'assignLabels',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: [] },
+		required: false,
+		description: 'Optional: Weisen Sie direkt Labels zu dieser neuen Karte zu',
+		typeOptions: {
+			multipleValues: true,
+			multipleValueButtonText: 'Label hinzufügen',
+		},
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getLabels',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Label-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Label-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['card'],
+				operation: ['create'],
+			},
+		},
+	},
+
 	// Felder für update
 	{
 		displayName: 'Neuer Titel',
@@ -437,6 +484,53 @@ export const cardFields: INodeProperties[] = [
 						properties: {
 							regex: '^[a-zA-Z0-9._@-]+$',
 							errorMessage: 'Bitte eine gültige Benutzer-ID eingeben',
+						},
+					},
+				],
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['card'],
+				operation: ['update'],
+			},
+		},
+	},
+
+	// Labels zuweisen für update (optional)
+	{
+		displayName: 'Labels zuweisen',
+		name: 'assignLabels',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: [] },
+		required: false,
+		description: 'Optional: Weisen Sie zusätzliche Labels zu dieser Karte zu',
+		typeOptions: {
+			multipleValues: true,
+			multipleValueButtonText: 'Label hinzufügen',
+		},
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getLabels',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Label-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Label-ID (Zahl) eingeben',
 						},
 					},
 				],

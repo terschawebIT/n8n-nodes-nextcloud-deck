@@ -56,9 +56,11 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
   - Reihenfolge im Stack (optional)
   - Fälligkeitsdatum (optional)
   - **🆕 Benutzer zuweisen** (optional) - Direkte Benutzerzuweisung bei Erstellung
+  - **🆕 Labels zuweisen** (optional) - Direkte Label-Zuweisung bei Erstellung
 - **Karte aktualisieren**: Aktualisiert eine vorhandene Karte (mit Dropdown-Auswahl)
   - Alle Felder optional
   - **🆕 Benutzer zuweisen** (optional) - Zusätzlichen Benutzer zuweisen
+  - **🆕 Labels zuweisen** (optional) - Zusätzliche Labels zuweisen
 - **Karte löschen**: Löscht eine Karte (mit Dropdown-Auswahl)
 - **Benutzer zuweisen**: Weist einen Benutzer zu einer Karte zu
 - **Benutzer entfernen**: Entfernt einen Benutzer von einer Karte

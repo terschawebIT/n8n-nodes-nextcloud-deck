@@ -198,6 +198,7 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
+			const assignLabels = this.getNodeParameter('assignLabels', i, []) as unknown[];
 			
 			const cardData: { title: string; type?: string; order?: number; description?: string; duedate?: string } = { title };
 			if (description) cardData.description = description;
@@ -206,16 +207,31 @@ export class CardHandler {
 			if (duedate) cardData.duedate = duedate;
 			
 			const card = await cardActions.createCard.call(this, boardId, stackId, cardData);
+			const cardId = (card as { id: number }).id;
 			
 			// Optional: Benutzer zuweisen, falls angegeben
 			if (assignUser) {
 				const userId = getResourceString(assignUser);
 				if (userId) {
 					try {
-						await cardActions.assignUserToCard.call(this, boardId, stackId, (card as { id: number }).id, userId);
+						await cardActions.assignUserToCard.call(this, boardId, stackId, cardId, userId);
 					} catch (assignError) {
 						// Fehler bei Benutzerzuweisung loggen, aber Karte wurde erfolgreich erstellt
 						// Stille Fehlerbehandlung - Karte wurde trotzdem erstellt
+					}
+				}
+			}
+			
+			// Optional: Labels zuweisen, falls angegeben
+			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
+				for (const labelParam of assignLabels) {
+					const labelId = getResourceId(labelParam);
+					if (labelId) {
+						try {
+							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, labelId);
+						} catch (labelError) {
+							// Stille Fehlerbehandlung - Karte wurde trotzdem erstellt
+						}
 					}
 				}
 			}
@@ -224,9 +240,14 @@ export class CardHandler {
 				success: true,
 				operation: 'create',
 				resource: 'card',
-				message: assignUser && getResourceString(assignUser) ? 
-					'Karte erfolgreich erstellt und Benutzer zugewiesen' : 
-					'Karte erfolgreich erstellt',
+				message: (() => {
+					let msg = 'Karte erfolgreich erstellt';
+					if (assignUser && getResourceString(assignUser)) msg += ' und Benutzer zugewiesen';
+					if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
+						msg += ` und ${assignLabels.length} Label(s) zugewiesen`;
+					}
+					return msg;
+				})(),
 				data: { card },
 			};
 		} else if (operation === 'update') {
@@ -239,6 +260,7 @@ export class CardHandler {
 			const order = this.getNodeParameter('order', i, 0) as number;
 			const duedate = this.getNodeParameter('duedate', i, '') as string;
 			const assignUser = this.getNodeParameter('assignUser', i, '') as string;
+			const assignLabels = this.getNodeParameter('assignLabels', i, []) as unknown[];
 			
 			// Wenn order = 0, holen wir die aktuelle Reihenfolge
 			let finalOrder = order;
@@ -268,13 +290,32 @@ export class CardHandler {
 				}
 			}
 			
+			// Optional: Labels zuweisen, falls angegeben
+			if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
+				for (const labelParam of assignLabels) {
+					const labelId = getResourceId(labelParam);
+					if (labelId) {
+						try {
+							await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, labelId);
+						} catch (labelError) {
+							// Stille Fehlerbehandlung - Karte wurde trotzdem aktualisiert
+						}
+					}
+				}
+			}
+			
 			return {
 				success: true,
 				operation: 'update',
 				resource: 'card',
-				message: assignUser && getResourceString(assignUser) ? 
-					'Karte erfolgreich aktualisiert und Benutzer zugewiesen' : 
-					'Karte erfolgreich aktualisiert',
+				message: (() => {
+					let msg = 'Karte erfolgreich aktualisiert';
+					if (assignUser && getResourceString(assignUser)) msg += ' und Benutzer zugewiesen';
+					if (assignLabels && Array.isArray(assignLabels) && assignLabels.length > 0) {
+						msg += ` und ${assignLabels.length} Label(s) zugewiesen`;
+					}
+					return msg;
+				})(),
 				data: { card },
 			};
 		} else if (operation === 'delete') {
