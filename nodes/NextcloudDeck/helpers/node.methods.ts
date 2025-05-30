@@ -51,14 +51,19 @@ export class NodeLoadOptions {
 
 	static async getLabels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 		try {
-			const boardIdString = this.getCurrentNodeParameter('boardId') as string;
-			if (!boardIdString) {
-				return [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }];
+			// Holen der Board-ID aus resourceLocator
+			const boardParam = this.getCurrentNodeParameter('boardId');
+			let boardId: number;
+			
+			if (typeof boardParam === 'object' && boardParam !== null) {
+				const boardResourceLocator = boardParam as { mode: string; value: string };
+				boardId = parseInt(boardResourceLocator.value, 10);
+			} else {
+				boardId = parseInt(boardParam as string, 10);
 			}
 			
-			const boardId = parseInt(boardIdString, 10);
-			if (isNaN(boardId)) {
-				return [{ name: 'Ungültige Board-ID', value: '' }];
+			if (!boardId || isNaN(boardId)) {
+				return [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }];
 			}
 			
 			const labels = await boardActions.getLabels.call(this, boardId);
