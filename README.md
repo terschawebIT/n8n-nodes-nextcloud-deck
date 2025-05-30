@@ -233,6 +233,11 @@ Niko Terschawetz - [nt@terschaweb.de](mailto:nt@terschaweb.de)
 
 ## Changelog
 
+### Version 1.2.7 (2025-01-03)
+- 🔧 **AI Tool Kompatibilität**: DisplayName-Felder ohne Umlaute und Bindestriche angepasst
+- ✨ **Schema-Fixes**: "Fälligkeitsdatum" → "Faelligkeitsdatum", "Anhang-ID" → "Anhang ID"
+- 🤖 **Bessere AI Integration**: Vermeidung von Schema-Fehlern bei AI Tool Verwendung
+
 ### Version 1.2.6 (2025-05-30)
 - 📝 **Dokumentation**: AI Support Limitation dokumentiert und Workarounds hinzugefügt
 - 📋 **README Update**: Umfassende Dokumentation der AI Agent Funktionalität

@@ -175,7 +175,7 @@ export const attachmentFields: INodeProperties[] = [
 
 	// Attachment-ID für get, update, delete
 	{
-		displayName: 'Anhang-ID',
+		displayName: 'Anhang ID',
 		name: 'attachmentId',
 		type: 'string',
 		required: true,
@@ -192,7 +192,7 @@ export const attachmentFields: INodeProperties[] = [
 
 	// Typ für create
 	{
-		displayName: 'Anhang-Typ',
+		displayName: 'Anhang Typ',
 		name: 'type',
 		type: 'options',
 		required: true,

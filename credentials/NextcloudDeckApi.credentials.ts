@@ -25,7 +25,7 @@ export class NextcloudDeckApi implements ICredentialType {
 			description: 'Ihr Nextcloud Benutzername',
 		},
 		{
-			displayName: 'Passwort oder App-Passwort',
+			displayName: 'Passwort oder App Passwort',
 			name: 'password',
 			type: 'string',
 			typeOptions: {

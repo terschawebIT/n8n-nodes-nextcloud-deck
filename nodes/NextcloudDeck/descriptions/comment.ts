@@ -176,7 +176,7 @@ export const commentFields: INodeProperties[] = [
 
 	// Comment-ID für get, update, delete
 	{
-		displayName: 'Kommentar-ID',
+		displayName: 'Kommentar ID',
 		name: 'commentId',
 		type: 'string',
 		required: true,

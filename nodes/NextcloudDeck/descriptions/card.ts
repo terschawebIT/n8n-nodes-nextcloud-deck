@@ -271,7 +271,7 @@ export const cardFields: INodeProperties[] = [
 
 	// Fälligkeitsdatum für create (optional)
 	{
-		displayName: 'Fälligkeitsdatum',
+		displayName: 'Faelligkeitsdatum',
 		name: 'duedate',
 		type: 'dateTime',
 		displayOptions: {
@@ -410,7 +410,7 @@ export const cardFields: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'Neues Fälligkeitsdatum',
+		displayName: 'Neues Faelligkeitsdatum',
 		name: 'duedate',
 		type: 'dateTime',
 		displayOptions: {
