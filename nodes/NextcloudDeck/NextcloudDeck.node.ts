@@ -29,7 +29,7 @@ import {
 	cardFields,
 } from './descriptions';
 
-import { nextcloudDeckApiRequest, nextcloudDeckOcsApiRequest, nextcloudShareeApiRequest } from './helpers/api';
+import { nextcloudShareeApiRequest } from './helpers/api';
 
 export class NextcloudDeck implements INodeType {
 	description: INodeTypeDescription = {
