@@ -5,17 +5,15 @@ import {
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
-	IDataObject,
 	NodeConnectionType,
 	INodeListSearchResult,
 } from 'n8n-workflow';
 
 // Modulare Handler importieren
-import { BoardHandler, StackHandler, CardHandler, LabelHandler, CommentHandler, AttachmentHandler } from './handlers/resource.handlers';
+import { BoardHandler, StackHandler, CardHandler, CommentHandler, AttachmentHandler } from './handlers/resource.handlers';
 import { NodeLoadOptions, NodeListSearch } from './helpers/node.methods';
 
 // Beschreibungen importieren
-import { nodeProperties } from './descriptions';
 import { boardOperations, boardFields } from './descriptions/board';
 import { stackOperations, stackFields } from './descriptions/stack';
 import { cardOperations, cardFields } from './descriptions/card';
