@@ -323,13 +323,40 @@ export const cardFields: INodeProperties[] = [
 	{
 		displayName: 'Labels zuweisen',
 		name: 'assignLabels',
-		type: 'multiOptions',
-		default: [],
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: false,
 		description: 'Optional: Weisen Sie direkt Labels zu dieser neuen Karte zu',
 		typeOptions: {
-			loadOptionsMethod: 'getLabels',
+			multipleValues: true,
 		},
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getLabels',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Label-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Label-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['card'],
@@ -473,13 +500,40 @@ export const cardFields: INodeProperties[] = [
 	{
 		displayName: 'Labels zuweisen',
 		name: 'assignLabels',
-		type: 'multiOptions',
-		default: [],
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: false,
 		description: 'Optional: Weisen Sie zusätzliche Labels zu dieser Karte zu',
 		typeOptions: {
-			loadOptionsMethod: 'getLabels',
+			multipleValues: true,
 		},
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getLabels',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Label-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Bitte eine gültige Label-ID (Zahl) eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['card'],

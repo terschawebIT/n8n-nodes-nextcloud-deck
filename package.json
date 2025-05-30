@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-nextcloud-deck",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "n8n Node für die Integration mit Nextcloud Deck",
   "keywords": [
     "n8n-community-node-package",

@@ -51,26 +51,18 @@ export class NodeLoadOptions {
 
 	static async getLabels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 		try {
-			// Holen der Board-ID aus resourceLocator mit ausführlichem Debugging
+			// Holen der Board-ID aus resourceLocator
 			const boardParam = this.getCurrentNodeParameter('boardId');
-			console.log('boardParam:', JSON.stringify(boardParam, null, 2));
-			
 			let boardId: number;
 			
 			if (typeof boardParam === 'object' && boardParam !== null) {
 				const boardResourceLocator = boardParam as { mode: string; value: string };
-				console.log('resourceLocator mode:', boardResourceLocator.mode);
-				console.log('resourceLocator value:', boardResourceLocator.value);
 				boardId = parseInt(boardResourceLocator.value, 10);
 			} else {
-				console.log('boardParam as string:', boardParam);
 				boardId = parseInt(boardParam as string, 10);
 			}
 			
-			console.log('Final boardId:', boardId);
-			
 			if (!boardId || isNaN(boardId)) {
-				console.log('Board-ID ist ungültig oder nicht gesetzt');
 				return [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }];
 			}
 			
@@ -82,8 +74,7 @@ export class NodeLoadOptions {
 				name: label.title,
 				value: label.id?.toString() || '',
 			}));
-		} catch (error) {
-			console.error('Fehler in getLabels:', error);
+		} catch (_error) {
 			return [{ name: 'Fehler beim Laden der Labels', value: '' }];
 		}
 	}
