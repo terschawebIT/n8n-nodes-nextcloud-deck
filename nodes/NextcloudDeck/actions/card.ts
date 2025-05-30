@@ -8,23 +8,23 @@ import { ICardCreate, ICardUpdate, IComment, ICommentCreate } from '../interface
 
 export async function getCards(this: IExecuteFunctions, boardId: number, stackId: number): Promise<ICard[]> {
 	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks/${stackId}/cards`);
-	return response;
+	return response as unknown as ICard[];
 }
 
 export async function getCard(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number): Promise<ICard> {
 	const response = await nextcloudDeckApiRequest.call(this, 'GET', `/boards/${boardId}/stacks/${stackId}/cards/${cardId}`);
-	return response;
+	return response as unknown as ICard;
 }
 
 export async function createCard(this: IExecuteFunctions, boardId: number, stackId: number, cardData: ICardCreate): Promise<ICard> {
 	const response = await nextcloudDeckApiRequest.call(this, 'POST', `/boards/${boardId}/stacks/${stackId}/cards`, cardData);
-	return response;
+	return response as unknown as ICard;
 }
 
 export async function updateCard(this: IExecuteFunctions, boardId: number, stackId: number, cardData: ICardUpdate): Promise<ICard> {
 	const { id, ...updateData } = cardData;
 	const response = await nextcloudDeckApiRequest.call(this, 'PUT', `/boards/${boardId}/stacks/${stackId}/cards/${id}`, updateData);
-	return response;
+	return response as unknown as ICard;
 }
 
 export async function deleteCard(this: IExecuteFunctions, boardId: number, stackId: number, cardId: number): Promise<IDataObject> {
@@ -61,17 +61,17 @@ export async function getComments(this: IExecuteFunctions, cardId: number, limit
 	if (params.length > 0) endpoint += `?${params.join('&')}`;
 	
 	const response = await nextcloudDeckOcsApiRequest.call(this, 'GET', endpoint);
-	return response;
+	return response as unknown as IComment[];
 }
 
 export async function createComment(this: IExecuteFunctions, cardId: number, commentData: ICommentCreate): Promise<IComment> {
 	const response = await nextcloudDeckOcsApiRequest.call(this, 'POST', `/cards/${cardId}/comments`, commentData);
-	return response;
+	return response as unknown as IComment;
 }
 
 export async function updateComment(this: IExecuteFunctions, cardId: number, commentId: string, message: string): Promise<IComment> {
 	const response = await nextcloudDeckOcsApiRequest.call(this, 'PUT', `/cards/${cardId}/comments/${commentId}`, { message });
-	return response;
+	return response as unknown as IComment;
 }
 
 export async function deleteComment(this: IExecuteFunctions, cardId: number, commentId: string): Promise<IDataObject> {
