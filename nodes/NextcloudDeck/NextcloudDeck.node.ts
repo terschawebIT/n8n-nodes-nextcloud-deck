@@ -16,7 +16,7 @@ import * as stackActions from './actions/stack';
 import * as cardActions from './actions/card';
 import { IBoardUpdate } from './interfaces/board';
 import { IStackUpdate } from './interfaces/stack';
-import { ICardUpdate } from './interfaces/card';
+import { ICardUpdate, ILabelCreate, ILabelUpdate } from './interfaces/card';
 
 // Beschreibungen importieren
 import {
@@ -27,6 +27,8 @@ import {
 	stackFields,
 	cardOperations,
 	cardFields,
+	labelOperations,
+	labelFields,
 } from './descriptions';
 
 import { nextcloudShareeApiRequest, nextcloudOcsUsersApiRequest } from './helpers/api';
@@ -65,10 +67,14 @@ export class NextcloudDeck implements INodeType {
 			// Card-Operationen
 			...cardOperations,
 
+			// Label-Operationen
+			...labelOperations,
+
 			// Feld-Definitionen
 			...boardFields,
 			...stackFields,
 			...cardFields,
+			...labelFields,
 		],
 	};
 
@@ -110,6 +116,30 @@ export class NextcloudDeck implements INodeType {
 					}));
 				} catch (_error) {
 					return [{ name: 'Fehler beim Laden der Stacks', value: '' }];
+				}
+			},
+			async getLabels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				try {
+					const boardIdString = this.getCurrentNodeParameter('boardId') as string;
+					if (!boardIdString) {
+						return [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }];
+					}
+					
+					const boardId = parseInt(boardIdString, 10);
+					if (isNaN(boardId)) {
+						return [{ name: 'Ungültige Board-ID', value: '' }];
+					}
+					
+					const labels = await boardActions.getLabels.call(this, boardId);
+					if (!labels || labels.length === 0) {
+						return [{ name: 'Keine Labels gefunden', value: '' }];
+					}
+					return labels.map((label) => ({
+						name: label.title,
+						value: label.id?.toString() || '',
+					}));
+				} catch (_error) {
+					return [{ name: 'Fehler beim Laden der Labels', value: '' }];
 				}
 			},
 		},
@@ -292,6 +322,46 @@ export class NextcloudDeck implements INodeType {
 					return { results: uniqueResults };
 				} catch (_error) {
 					return { results: [{ name: 'Fehler beim Laden der Benutzer', value: '' }] };
+				}
+			},
+			async getLabels(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+				try {
+					// Holen der Board-ID aus resourceLocator
+					const boardParam = this.getCurrentNodeParameter('boardId');
+					let boardId: number;
+					
+					if (typeof boardParam === 'object' && boardParam !== null) {
+						const boardResourceLocator = boardParam as { mode: string; value: string };
+						boardId = parseInt(boardResourceLocator.value, 10);
+					} else {
+						boardId = parseInt(boardParam as string, 10);
+					}
+					
+					if (!boardId || isNaN(boardId)) {
+						return { results: [{ name: 'Bitte wählen Sie zuerst ein Board', value: '' }] };
+					}
+					
+					const labels = await boardActions.getLabels.call(this, boardId);
+					if (!labels || labels.length === 0) {
+						return { results: [{ name: 'Keine Labels gefunden', value: '' }] };
+					}
+					
+					let filteredLabels = labels;
+					if (filter && filter.trim().length > 0) {
+						const normalized = filter.toLowerCase();
+						filteredLabels = labels.filter(label => 
+							label.title.toLowerCase().includes(normalized)
+						);
+					}
+					
+					return {
+						results: filteredLabels.map((label) => ({
+							name: label.title,
+							value: label.id?.toString() || '',
+						}))
+					};
+				} catch (_error) {
+					return { results: [{ name: 'Fehler beim Laden der Labels', value: '' }] };
 				}
 			},
 		},
@@ -602,6 +672,104 @@ export class NextcloudDeck implements INodeType {
 							operation: 'unassignUser',
 							resource: 'card',
 							message: 'Benutzer erfolgreich entfernt',
+							data: response,
+						});
+					}
+				} else if (resource === 'label') {
+					// Label-Operationen
+					if (operation === 'getAll') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const labels = await boardActions.getLabels.call(this, boardId);
+						returnData.push({
+							success: true,
+							operation: 'getAll',
+							resource: 'label',
+							message: `${labels.length} Labels im Board gefunden`,
+							data: { labels, boardId },
+						});
+					} else if (operation === 'get') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const labelId = getResourceId(this.getNodeParameter('labelId', i));
+						const label = await boardActions.getLabel.call(this, boardId, labelId);
+						returnData.push({
+							success: true,
+							operation: 'get',
+							resource: 'label',
+							data: { label },
+						});
+					} else if (operation === 'create') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const title = this.getNodeParameter('title', i) as string;
+						const color = this.getNodeParameter('color', i) as string;
+						
+						// Farbe ohne # für API
+						const cleanColor = color.replace('#', '');
+						
+						const labelData: ILabelCreate = { title, color: cleanColor };
+						const label = await boardActions.createLabel.call(this, boardId, labelData);
+						returnData.push({
+							success: true,
+							operation: 'create',
+							resource: 'label',
+							message: 'Label erfolgreich erstellt',
+							data: { label },
+						});
+					} else if (operation === 'update') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const labelId = getResourceId(this.getNodeParameter('labelId', i));
+						const title = this.getNodeParameter('title', i, '') as string;
+						const color = this.getNodeParameter('color', i, '') as string;
+						
+						const labelData: ILabelUpdate = { id: labelId };
+						if (title) labelData.title = title;
+						if (color) {
+							// Farbe ohne # für API
+							labelData.color = color.replace('#', '');
+						}
+						
+						const label = await boardActions.updateLabel.call(this, boardId, labelData);
+						returnData.push({
+							success: true,
+							operation: 'update',
+							resource: 'label',
+							message: 'Label erfolgreich aktualisiert',
+							data: { label },
+						});
+					} else if (operation === 'delete') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const labelId = getResourceId(this.getNodeParameter('labelId', i));
+						const response = await boardActions.deleteLabel.call(this, boardId, labelId);
+						returnData.push({
+							success: true,
+							operation: 'delete',
+							resource: 'label',
+							message: 'Label erfolgreich gelöscht',
+							data: response,
+						});
+					} else if (operation === 'assignToCard') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const labelId = getResourceId(this.getNodeParameter('labelId', i));
+						const response = await cardActions.addLabelToCard.call(this, boardId, stackId, cardId, labelId);
+						returnData.push({
+							success: true,
+							operation: 'assignToCard',
+							resource: 'label',
+							message: 'Label erfolgreich zu Karte zugewiesen',
+							data: response,
+						});
+					} else if (operation === 'removeFromCard') {
+						const boardId = getResourceId(this.getNodeParameter('boardId', i));
+						const stackId = getResourceId(this.getNodeParameter('stackId', i));
+						const cardId = getResourceId(this.getNodeParameter('cardId', i));
+						const labelId = getResourceId(this.getNodeParameter('labelId', i));
+						const response = await cardActions.removeLabelFromCard.call(this, boardId, stackId, cardId, labelId);
+						returnData.push({
+							success: true,
+							operation: 'removeFromCard',
+							resource: 'label',
+							message: 'Label erfolgreich von Karte entfernt',
 							data: response,
 						});
 					}

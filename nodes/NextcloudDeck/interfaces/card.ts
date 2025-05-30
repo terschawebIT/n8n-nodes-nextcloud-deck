@@ -43,4 +43,26 @@ export interface IMention {
 	mentionId: string;
 	mentionType: string;
 	mentionDisplayName: string;
+}
+
+// Label interfaces
+export interface ILabel {
+	id: number;
+	title: string;
+	color: string;
+	boardId: number;
+	cardId?: number | null;
+}
+
+export interface ILabelCreate {
+	title: string;
+	color: string;
+	[key: string]: string;
+}
+
+export interface ILabelUpdate {
+	id: number;
+	title?: string;
+	color?: string;
+	[key: string]: string | number | undefined;
 } 

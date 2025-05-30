@@ -63,6 +63,19 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **Benutzer zuweisen**: Weist einen Benutzer zu einer Karte zu
 - **Benutzer entfernen**: Entfernt einen Benutzer von einer Karte
 
+### Label-Operationen (Tags/Etiketten)
+
+- **🆕 Alle Labels abrufen**: Listet alle Labels eines Boards auf (mit Board-Dropdown)
+- **🆕 Label abrufen**: Ruft ein spezifisches Label ab (mit Board- und Label-Dropdown)
+- **🆕 Label erstellen**: Erstellt ein neues Label in einem Board
+  - Titel (erforderlich)
+  - Farbe (erforderlich, mit Farbwähler)
+- **🆕 Label aktualisieren**: Aktualisiert ein vorhandenes Label (mit Dropdown-Auswahl)
+  - Titel und Farbe optional
+- **🆕 Label löschen**: Löscht ein Label (mit Dropdown-Auswahl)
+- **🆕 Label zu Karte zuweisen**: Weist ein Label zu einer Karte zu
+- **🆕 Label von Karte entfernen**: Entfernt ein Label von einer Karte
+
 > **Hinweis**: Die Nextcloud Deck API stellt keinen direkten Endpunkt zum Abrufen aller Karten eines Stacks bereit. Die Operation "Stack mit Karten abrufen" ruft stattdessen den Stack ab und extrahiert die darin enthaltenen Karten.
 
 ### UI-Verbesserungen
@@ -80,10 +93,17 @@ Erstellen Sie neue Credentials für "Nextcloud Deck API" mit:
 - **API-Integration**: Perfekt für Workflows, die IDs aus anderen Systemen verwenden
 - **Benutzerfreundlichkeit**: Dropdown-Listen für manuelle Auswahl, ID-Eingabe für Automatisierung
 
+### Label-Management System
+
+- **🎨 Farb-basierte Organisation**: Erstellen Sie farbkodierte Labels für bessere visuelle Organisation
+- **🔄 Vollständige CRUD-Operationen**: Erstellen, Lesen, Aktualisieren und Löschen von Labels
+- **🏷️ Flexibles Tagging**: Weisen Sie Labels dynamisch zu Karten zu oder entfernen Sie sie
+- **📋 Board-übergreifende Verwaltung**: Labels werden auf Board-Ebene verwaltet und können allen Karten des Boards zugewiesen werden
+- **🔍 Suchbare Listen**: Alle Label-Listen sind durchsuchbar für bessere Benutzerfreundlichkeit
+
 ### Geplante Funktionen
 
-- Label-Management für Karten
-- Kommentar-System
+- Kommentar-System (OCS API bereits vorbereitet)
 - Anhänge verwalten
 
 ## API-Dokumentation
