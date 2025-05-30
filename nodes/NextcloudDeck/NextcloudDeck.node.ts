@@ -29,6 +29,8 @@ import {
 	cardFields,
 } from './descriptions';
 
+import { nextcloudDeckApiRequest, nextcloudDeckOcsApiRequest, nextcloudShareeApiRequest } from './helpers/api';
+
 export class NextcloudDeck implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Nextcloud Deck',
@@ -227,6 +229,29 @@ export class NextcloudDeck implements INodeType {
 					return { results: [{ name: 'Fehler beim Laden der Karten', value: '' }] };
 				}
 			},
+			async getUsers(this: ILoadOptionsFunctions, filter?: string): Promise<INodeListSearchResult> {
+				try {
+					// Verwende den Sharee-Endpunkt, um Benutzer zu suchen
+					const searchTerm = filter || '';
+					const endpoint = `/sharees?search=${encodeURIComponent(searchTerm)}&itemType=0&perPage=50`;
+					
+					const response = await nextcloudShareeApiRequest.call(this, 'GET', endpoint);
+					const shareeData = response as { users?: Array<{ value: { shareWith: string; shareWithDisplayName: string } }> };
+					
+					if (!shareeData.users || shareeData.users.length === 0) {
+						return { results: [{ name: 'Keine Benutzer gefunden', value: '' }] };
+					}
+					
+					return {
+						results: shareeData.users.map((user) => ({
+							name: user.value.shareWithDisplayName || user.value.shareWith,
+							value: user.value.shareWith,
+						}))
+					};
+				} catch (_error) {
+					return { results: [{ name: 'Fehler beim Laden der Benutzer', value: '' }] };
+				}
+			},
 		},
 	};
 
@@ -243,6 +268,15 @@ export class NextcloudDeck implements INodeType {
 				return parseInt(resourceLocator.value, 10);
 			}
 			return parseInt(resourceParam as string, 10);
+		};
+
+		// Hilfsfunktion zum Extrahieren von resourceLocator-Werten als String
+		const getResourceString = (resourceParam: unknown): string => {
+			if (typeof resourceParam === 'object' && resourceParam !== null) {
+				const resourceLocator = resourceParam as { mode: string; value: string };
+				return resourceLocator.value;
+			}
+			return resourceParam as string;
 		};
 
 		for (let i = 0; i < items.length; i++) {
@@ -472,7 +506,7 @@ export class NextcloudDeck implements INodeType {
 						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const cardId = getResourceId(this.getNodeParameter('cardId', i));
-						const userId = this.getNodeParameter('userId', i) as string;
+						const userId = getResourceString(this.getNodeParameter('userId', i));
 						const response = await cardActions.assignUserToCard.call(this, boardId, stackId, cardId, userId);
 						returnData.push({
 							success: true,
@@ -485,7 +519,7 @@ export class NextcloudDeck implements INodeType {
 						const boardId = getResourceId(this.getNodeParameter('boardId', i));
 						const stackId = getResourceId(this.getNodeParameter('stackId', i));
 						const cardId = getResourceId(this.getNodeParameter('cardId', i));
-						const userId = this.getNodeParameter('userId', i) as string;
+						const userId = getResourceString(this.getNodeParameter('userId', i));
 						const response = await cardActions.unassignUserFromCard.call(this, boardId, stackId, cardId, userId);
 						returnData.push({
 							success: true,

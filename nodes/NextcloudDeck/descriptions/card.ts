@@ -366,17 +366,44 @@ export const cardFields: INodeProperties[] = [
 
 	// Benutzer-ID für assignUser und unassignUser
 	{
-		displayName: 'Benutzer-ID',
+		displayName: 'Benutzer',
 		name: 'userId',
-		type: 'string',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
 		required: true,
+		description: 'Wählen Sie einen Benutzer aus der Liste oder geben Sie dessen ID an',
+		modes: [
+			{
+				displayName: 'Liste',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'getUsers',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'Benutzer-ID',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[a-zA-Z0-9._@-]+$',
+							errorMessage: 'Bitte eine gültige Benutzer-ID eingeben',
+						},
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['card'],
 				operation: ['assignUser', 'unassignUser'],
 			},
 		},
-		default: '',
-		description: 'Die ID des Benutzers der zugewiesen/entfernt werden soll',
 	},
 ]; 
